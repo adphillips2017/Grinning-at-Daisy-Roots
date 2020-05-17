@@ -123,6 +123,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "dungeon"
+    }
+  },
+  "defaultProject": "dungeon",
+  "cli": {
+    "analytics": "b3803ecf-2e97-48e1-b62f-adb2e33d0107"
+  }
 }
