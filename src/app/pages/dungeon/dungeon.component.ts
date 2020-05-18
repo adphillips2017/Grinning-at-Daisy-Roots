@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { User } from 'src/app/classes/User';
 
 @Component({
@@ -6,10 +6,6 @@ import { User } from 'src/app/classes/User';
   templateUrl: './dungeon.component.html',
   styleUrls: ['./dungeon.component.scss']
 })
-export class DungeonComponent implements OnInit {
+export class DungeonComponent {
   user: User = new User();
-
-  ngOnInit(): void {
-  }
-
 }

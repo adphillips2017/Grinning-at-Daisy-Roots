@@ -5,7 +5,7 @@ import { DungeonComponent } from './pages/dungeon/dungeon.component';
 
 
 const routes: Routes = [
-  { path: '/dungeon', component: DungeonComponent }
+  { path: '', component: DungeonComponent }
 ];
 
 @NgModule({
