@@ -1,3 +1,12 @@
 
-  Dungeon Component
-  <app-hero-panel [stats]="user.getStats()"></app-hero-panel>
+<div class="game-canvas">
+    <div class="hud-container">
+        <app-hero-panel [stats]="user.getStats()"></app-hero-panel>
+        <div class="temp-main-display placeholder"></div>
+        <div class="temp-map placeholder"></div>
+    </div>
+
+    <div class="terminal">
+        <div class="temp-terminal-display placeholder"></div>
+    </div>
+</div>
