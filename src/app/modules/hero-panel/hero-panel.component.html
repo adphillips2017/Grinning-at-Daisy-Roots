@@ -1,0 +1,20 @@
+<div class="hero-panel">
+    <div>
+        <img
+            src="../../../assets/images/hero-portrait/hero-portrait.jpg"
+            alt="hero-portrait.jpeg"
+            class="hero-portrait"
+        >
+    </div>
+
+    <div class="hero-stats">
+        <div class="hero-stat" *ngFor="let stat of stats">
+            <div class="hero-stat-label">
+                {{ stat.label }}
+            </div>
+            <div class="hero-stat-value">
+                {{ stat.value }}
+            </div>
+        </div>
+    </div>
+</div>
