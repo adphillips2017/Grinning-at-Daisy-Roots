@@ -5,23 +5,29 @@
         display: flex;
         justify-content: space-between;
 
+        .middle-column {
+            width: 100%;
+            padding: 2rem;
+            padding-top: 0px;
+
+            .terminal {
+                margin-top: 2rem;
+
+                .temp-terminal-display{
+                    width: 100%;
+                    height: 24rem;
+                }
+            }
+        }
+
         .temp-main-display {
             height: 31rem;
-            width: 50%;
+            width: 100%;
         }
 
         .temp-map {
             height: 24rem;
             width: 24rem;
-        }
-    }
-
-    .terminal {
-        margin-top: 2rem;
-
-        .temp-terminal-display{
-            width: 100%;
-            height: 24rem;
         }
     }
 }

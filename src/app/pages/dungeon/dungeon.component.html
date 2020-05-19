@@ -2,11 +2,13 @@
 <div class="game-canvas">
     <div class="hud-container">
         <app-hero-panel [stats]="user.getStats()"></app-hero-panel>
-        <div class="temp-main-display placeholder"></div>
+        <div class="middle-column">
+            <div class="temp-main-display placeholder"></div>
+            <div class="terminal">
+                <app-terminal-display [messages]="messages"></app-terminal-display>
+                <app-terminal-input (issueCommand)="issueCommand($event)"></app-terminal-input>
+            </div>
+        </div>
         <div class="temp-map placeholder"></div>
-    </div>
-
-    <div class="terminal">
-        <div class="temp-terminal-display placeholder"></div>
     </div>
 </div>

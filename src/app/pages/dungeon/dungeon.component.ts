@@ -8,4 +8,10 @@ import { User } from 'src/app/classes/User';
 })
 export class DungeonComponent {
   user: User = new User();
+  messages = [];
+
+  issueCommand(message: string): void {
+    const userCommand = {type: 'user-input', message};
+    this.messages.push(userCommand);
+  }
 }

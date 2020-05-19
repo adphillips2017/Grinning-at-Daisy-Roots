@@ -1,0 +1,6 @@
+<div class="terminal-display">
+    <div class="output" *ngFor="let message of messages">
+        <div class="output-bullet">></div>
+        <div class="output-message" [class.color-blue]="message.type == 'user-input'">{{ message.message }}</div>
+    </div>
+</div>
