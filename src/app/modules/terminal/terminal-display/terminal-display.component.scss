@@ -1,0 +1,23 @@
+.terminal-display {
+    border: 1px solid lightgray;
+    height: 10rem;
+    overflow-y: scroll;
+    padding: .5rem;
+
+    .output {
+        display: flex;
+        margin-bottom: 1rem;
+
+        .output-bullet {
+            margin-right: .5rem;
+        }
+
+        .output-message {
+            color: black;
+        }
+    }
+}
+
+.color-blue {
+    color: blue !important;
+}
