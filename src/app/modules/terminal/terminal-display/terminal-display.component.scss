@@ -1,19 +1,22 @@
 .terminal-display {
     border: 1px solid lightgray;
-    height: 10rem;
+    height: 19rem;
     overflow-y: scroll;
     padding: .5rem;
 
-    .input {
-        display: flex;
+    .display{
         margin-bottom: 1rem;
 
-        .input-bullet {
-            margin-right: .5rem;
-        }
+        .input {
+            display: flex;
 
-        .input-message {
-            color: blue;
+            .input-bullet {
+                margin-right: .5rem;
+            }
+
+            .input-message {
+                color: blue;
+            }
         }
     }
 }

@@ -1,20 +1,29 @@
+import { Item } from '../models/Item';
+
 export class User {
     private health: number;
-    private inventory: unknown[];
+    private inventory: Item[];
     strength: number;
     intelligence: number;
     perception: number;
     luck: number;
     gold: number;
+    x: number;
+    y: number;
 
     constructor() {
         this.health = 100;
-        this.inventory = [];
+        this.inventory = [
+            { label: 'Crusty Bread', count: 1 },
+            { label: 'Lockpick', count: 3 }
+        ];
         this.strength = 4;
         this.intelligence = 4;
         this.perception = 4;
         this.luck = 2;
         this.gold = 0;
+        this.x = 0;
+        this.y = 0;
     }
 
     getHealth(): number {
@@ -25,15 +34,15 @@ export class User {
         this.health = this.health + modifier;
     }
 
-    getInventory(): unknown[] {
+    getInventory(): Item[] {
         return this.inventory;
     }
 
-    giveItem(item: unknown): void {
+    giveItem(item: Item): void {
         this.inventory.push(item);
     }
 
-    removeItem(item: unknown): void {
+    removeItem(item: Item): void {
         if (this.inventory.indexOf(item) >= 0){ return; }
         this.inventory.splice(this.inventory.indexOf(item), 1);
     }
@@ -47,6 +56,6 @@ export class User {
             { label: 'Luck', value: this.luck },
             { label: 'Inventory', value: this.getInventory().length },
             { label: 'Gold', value: this.gold },
-        ]
+        ];
     }
 }
