@@ -16,6 +16,11 @@ export class DungeonComponent implements OnInit {
   playerActions = 0;
   worldMap: Map = [];
 
+  helpKeywords = ['help'];
+  moveKeywords = ['go', 'walk', 'travel', 'move', 'w', 'step', 'run', 'm'];
+  inventoryKeywords = ['i', 'inventory'];
+
+
   ngOnInit(){
     this.play();
   }
@@ -61,11 +66,46 @@ export class DungeonComponent implements OnInit {
     const command = playerInput.split(' ');
     const keyword = command[0];
 
-    if (this.contains(keyword, ['go', 'walk', 'travel', 'move', 'w', 'step', 'run', 'm'])) {
+    if (this.contains(keyword, this.helpKeywords)) {
+      this.help(command);
+    }
+    else if (this.contains(keyword, this.moveKeywords)) {
       this.move(command);
     }
-    else if (this.contains(keyword, ['i', 'inventory'])){
+    else if (this.contains(keyword, this.inventoryKeywords)){
       this.printInventory();
+    }
+    else {
+      this.output('Command not recognized, please try again.');
+      this.output('Type "help" for a list of commands.');
+    }
+  }
+
+  help(command: string[]) {
+    const commandList = [
+      'help         - print a list of commands.  User help "command" to get information about a specific command',
+      'move         - aliases: go, walk, travel, move, w, step, run, m',
+      'inventory    - aliases: i'
+    ];
+
+    if (!command[1]) {
+      this.output('Here is the list of commands you have access to:');
+      commandList.forEach(commandString => {
+        this.output(commandString);
+      });
+      return;
+    }
+
+    const helpItem = command[1];
+
+    if (this.contains(helpItem, this.moveKeywords)) {
+      this.output('"move":  move your character in one of four directions.');
+      this.output('Example:  move (north / up / forward...)');
+      this.output('move aliases: ' + this.arrayToString(this.moveKeywords));
+    }
+    else if (this.contains(helpItem, this.inventoryKeywords)){
+      this.output('"inventory": list the items currently in your inventory');
+      this.output('inventory aliases: ' + this.arrayToString(this.inventoryKeywords));
     }
     else {
       this.output('Command not recognized, please try again.');
@@ -175,5 +215,15 @@ export class DungeonComponent implements OnInit {
 
   contains(keyword: string, list: string[]): boolean {
     return list.indexOf(keyword) >= 0;
+  }
+
+  arrayToString(array: string[]): string {
+    let returnString = '';
+    array.forEach((tempString, index) => {
+      returnString += tempString;
+      if (index < array.length - 1) { returnString += ', '; }
+    });
+
+    return returnString;
   }
 }
