@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { User } from 'src/app/classes/User';
+import { Player } from 'src/app/classes/Player';
 import {Map } from '../../models/Map';
 
 @Component({
@@ -9,10 +9,11 @@ import {Map } from '../../models/Map';
   styleUrls: ['./dungeon.component.scss']
 })
 export class DungeonComponent implements OnInit {
-  user: User = new User();
+  player: Player = new Player();
   map: Map;
   messages = [];
   currentLevel = 1;
+  playerActions = 0;
 
   ngOnInit(){
     this.play();
@@ -22,22 +23,20 @@ export class DungeonComponent implements OnInit {
     this.output('Welcome to the dungeon.');
   }
 
-  issueCommand(userInput: string): void {
-    this.output(userInput, true);
-    this.parseCommand(userInput);
+  issueCommand(playerInput: string): void {
+    this.output(playerInput, true);
+    this.parseCommand(playerInput);
   }
 
-  parseCommand(userInput: string): void {
-    const command = userInput.split(' ');
+  parseCommand(playerInput: string): void {
+    const command = playerInput.split(' ');
     const keyword = command[0];
 
     if (this.contains(keyword, ['go', 'walk', 'travel', 'move', 'w', 'step', 'run', 'm'])) {
       this.move(command);
-      return;
     }
     else if (this.contains(keyword, ['i', 'inventory'])){
       this.printInventory();
-      return;
     }
     else {
       this.output('Command not recognized, please try again.');
@@ -74,18 +73,18 @@ export class DungeonComponent implements OnInit {
   }
 
   printInventory(): void {
-    const inventory = this.user.getInventory();
+    const inventory = this.player.getInventory();
     this.output('You currently have: ');
 
     inventory.forEach(item => {
       this.output('* ' + item.label + '  x' + item.count);
     });
 
-    this.output('* Gold  x' + this.user.gold);
+    this.output('* Gold  x' + this.player.gold);
   }
 
   output(message: string, command = false): void {
-    if (command){ this.messages.push({ type: 'user-input', message }); }
+    if (command){ this.messages.push({ type: 'player-input', message }); }
     else { this.messages.push({ type: 'output', message }); }
   }
 

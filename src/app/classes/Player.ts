@@ -1,6 +1,7 @@
-import { Item } from '../models/Item';
+import { Item } from './Items';
+import { RustyDagger } from './Weapons';
 
-export class User {
+export class Player {
     private health: number;
     private inventory: Item[];
     strength: number;
@@ -14,8 +15,9 @@ export class User {
     constructor() {
         this.health = 100;
         this.inventory = [
-            { label: 'Crusty Bread', count: 1 },
-            { label: 'Lockpick', count: 3 }
+            new Item('Crusty Bread', 1, 'Gross moldy bread.'),
+            new Item('Lockpick', 3, 'Small metal tool used to open locks.  Break easily.'),
+            new RustyDagger()
         ];
         this.strength = 4;
         this.intelligence = 4;
@@ -38,6 +40,16 @@ export class User {
         return this.inventory;
     }
 
+    getInventoryCount(): number {
+        let count = 0;
+
+        this.inventory.forEach(item => {
+            count += item.count;
+        });
+
+        return count;
+    }
+
     giveItem(item: Item): void {
         this.inventory.push(item);
     }
@@ -54,7 +66,7 @@ export class User {
             { label: 'Intelligence', value: this.intelligence },
             { label: 'Perception', value: this.perception },
             { label: 'Luck', value: this.luck },
-            { label: 'Inventory', value: this.getInventory().length },
+            { label: 'Inventory', value: this.getInventoryCount() },
             { label: 'Gold', value: this.gold },
         ];
     }
