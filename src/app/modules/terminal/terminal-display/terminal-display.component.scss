@@ -9,13 +9,10 @@
 
         .input {
             display: flex;
+            color: blue;
 
             .input-bullet {
                 margin-right: .5rem;
-            }
-
-            .input-message {
-                color: blue;
             }
         }
     }

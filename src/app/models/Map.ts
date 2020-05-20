@@ -1,7 +1,3 @@
-import { MapTile } from '../classes/MapTile';
+import { MapTile } from '../classes/MapTiles';
 
-export type Map = [
-    [MapTile, MapTile, MapTile],
-    [MapTile, MapTile, MapTile],
-    [MapTile, MapTile, MapTile]
-];
+export type Map = Array<Array<MapTile | undefined>>;

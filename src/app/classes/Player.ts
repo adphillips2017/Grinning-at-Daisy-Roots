@@ -4,13 +4,13 @@ import { RustyDagger } from './Weapons';
 export class Player {
     private health: number;
     private inventory: Item[];
+    x: number;
+    y: number;
     strength: number;
     intelligence: number;
     perception: number;
     luck: number;
     gold: number;
-    x: number;
-    y: number;
 
     constructor() {
         this.health = 100;
@@ -24,8 +24,8 @@ export class Player {
         this.perception = 4;
         this.luck = 2;
         this.gold = 0;
-        this.x = 0;
-        this.y = 0;
+        this.x = 1;
+        this.y = 2;
     }
 
     getHealth(): number {
@@ -69,5 +69,31 @@ export class Player {
             { label: 'Inventory', value: this.getInventoryCount() },
             { label: 'Gold', value: this.gold },
         ];
+    }
+
+    moveTo(x: number, y: number): void {
+        this.x = x;
+        this.y = y;
+    }
+
+    move(dx: number, dy: number): void{
+        this.x += dx;
+        this.y += dy;
+    }
+
+    moveNorth(): void {
+        this.move(0, -1);
+    }
+
+    moveSouth(): void {
+        this.move(0, 1);
+    }
+
+    moveEast(): void {
+        this.move(1, 0);
+    }
+
+    moveWest(): void {
+        this.move(-1, 0);
     }
 }
