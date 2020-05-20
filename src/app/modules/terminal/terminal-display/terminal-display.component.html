@@ -1,6 +1,11 @@
 <div class="terminal-display">
-    <div class="output" *ngFor="let message of messages">
-        <div class="output-bullet">></div>
-        <div class="output-message" [class.color-blue]="message.type == 'user-input'">{{ message.message }}</div>
+    <div class="display" *ngFor="let message of messages">
+        <div *ngIf="message.type == 'user-input'; else systemOutput" class="input">
+            <div class="input-bullet">></div>
+            <div class="input-message">{{ message.message }}</div>
+        </div>
+        <ng-template #systemOutput>
+            <div class="output-message">{{ message.message }}</div>
+        </ng-template>
     </div>
 </div>

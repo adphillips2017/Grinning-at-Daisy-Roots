@@ -4,20 +4,16 @@
     overflow-y: scroll;
     padding: .5rem;
 
-    .output {
+    .input {
         display: flex;
         margin-bottom: 1rem;
 
-        .output-bullet {
+        .input-bullet {
             margin-right: .5rem;
         }
 
-        .output-message {
-            color: black;
+        .input-message {
+            color: blue;
         }
     }
-}
-
-.color-blue {
-    color: blue !important;
 }
