@@ -222,6 +222,17 @@ export class DungeonComponent implements OnInit {
     this.output(currentTile.intro);
   }
 
+  getCurrentImage(): string {
+    const image = '../../../assets/images/backgrounds/' + this.currentTile().image;
+    return image;
+  }
+
+  currentTile(): MapTile | undefined {
+    const x = this.player.x;
+    const y = this.player.y;
+    return this.tileAt(x, y);
+  }
+
   tileAt(x: number, y: number): MapTile | undefined{
     if (x < 0 || y < 0){ return undefined; }
 

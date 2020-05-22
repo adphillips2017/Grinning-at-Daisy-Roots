@@ -6,9 +6,13 @@
         justify-content: space-between;
 
         .middle-column {
-            width: 100%;
+            width: 60%;
             padding: 2rem;
             padding-top: 0px;
+
+            .main-image {
+                width: 100%;
+            }
 
             .terminal {
                 margin-top: 2rem;
