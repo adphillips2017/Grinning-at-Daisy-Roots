@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Player } from 'src/app/classes/Player';
 import { MapTile, ExitTile, EmptyRoomTile, StartTile } from '../../classes/MapTiles';
 import { Map } from '../../models/Map';
+import { MapKey } from 'src/app/models/MapKey';
 
 @Component({
   selector: 'app-dungeon',
@@ -20,6 +21,12 @@ export class DungeonComponent implements OnInit {
   moveKeywords = ['go', 'walk', 'travel', 'move', 'w', 'step', 'run', 'm'];
   inventoryKeywords = ['i', 'inventory'];
 
+  mapKey: MapKey = [
+    ['--', 'XT', '--'],
+    ['ER', 'ST', 'ER'],
+    ['--', 'ER', '--']
+  ];
+
 
   ngOnInit(){
     this.play();
@@ -32,29 +39,46 @@ export class DungeonComponent implements OnInit {
   }
 
   createMap(): void {
-    let row = [];
-    row.push(undefined);
-    row.push(new ExitTile(1, 0));
-    row.push(undefined);
-    this.worldMap.push(row);
+    const map = [];
+    let mapRow = [];
+    let startCoords: [number, number] = [-1, -1];
+    let exitExists = false;
 
-    row = [];
-    row.push(undefined);
-    row.push(new EmptyRoomTile(1, 1));
-    row.push(undefined);
-    this.worldMap.push(row);
+    this.mapKey.forEach((row, y) => {
+      mapRow = [];
+      row.forEach((tile, x) => {
+        switch (tile){
+          case('--'): {
+            mapRow.push(undefined);
+            break;
+          }
+          case('ST'): {
+            mapRow.push(new StartTile(x, y));
+            startCoords = [x, y];
+            break;
+          }
+          case('ER'): {
+            mapRow.push(new EmptyRoomTile(x, y));
+            break;
+          }
+          case('XT'): {
+            mapRow.push(new ExitTile(x, y));
+            exitExists = true;
+            break;
+          }
+          default: break;
+        }
+      });
+      map.push(mapRow);
+    });
 
-    row = [];
-    row.push(new EmptyRoomTile(0, 2));
-    row.push(new StartTile(1, 2));
-    row.push(new EmptyRoomTile(2, 2));
-    this.worldMap.push(row);
+    if (startCoords === [-1, -1]) { console.warn('No Start Tile.'); }
+    if (!exitExists) { console.warn('No Exit Tile.'); }
 
-    row = [];
-    row.push(undefined);
-    row.push(new EmptyRoomTile(1, 3));
-    row.push(undefined);
-    this.worldMap.push(row);
+    this.worldMap = map;
+    this.player.moveTo(startCoords[0], startCoords[1]);
+    console.log('map: ', map);
+    console.log('player', this.player);
   }
 
   issueCommand(playerInput: string): void {
