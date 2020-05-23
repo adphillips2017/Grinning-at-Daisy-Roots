@@ -1,21 +1,27 @@
 import { Item } from './Items';
 import { RustyDagger } from './Weapons';
+import { MoldyBread } from './Consumables';
 
 export class Player {
     private health: number;
     private inventory: Item[];
+    private xpLevels: number[];
     x: number;
     y: number;
     strength: number;
     intelligence: number;
     perception: number;
+    defense: number;
     luck: number;
     gold: number;
+    level: number;
+    xp: number;
+    unallocatedPoints: number;
 
     constructor() {
         this.health = 100;
         this.inventory = [
-            new Item('Crusty Bread', 1, 'Gross moldy bread.'),
+            new MoldyBread(),
             new Item('Lockpick', 3, 'Small metal tool used to open locks.  Break easily.'),
             new RustyDagger()
         ];
@@ -26,6 +32,10 @@ export class Player {
         this.gold = 0;
         this.x = 1;
         this.y = 2;
+        this.xpLevels = [5, 7, 10, 15, 20];
+        this.level = 0;
+        this.xp = 0;
+        this.unallocatedPoints = 0;
     }
 
     getHealth(): number {
@@ -48,6 +58,25 @@ export class Player {
         });
 
         return count;
+    }
+
+    giveXP(xp: number): void {
+        if (this.xpNeeded() >= xp) {
+            this.xp += xp;
+            return;
+        }
+
+        const leftOver = xp - this.xpNeeded();
+        this.xp = leftOver;
+    }
+
+    xpNeeded(): number {
+        return this.xpLevels[this.level + 1] - this.xp;
+    }
+
+    levelUp(): void {
+        this.level += 1;
+        this.unallocatedPoints += 1;
     }
 
     giveItem(item: Item): void {

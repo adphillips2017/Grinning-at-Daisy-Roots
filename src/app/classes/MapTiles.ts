@@ -1,3 +1,5 @@
+import { Enemy, getRandomTier1Enemy } from './Enemy';
+
 class MapTile {
     x: number;
     y: number;
@@ -36,6 +38,27 @@ class EmptyRoomTile extends MapTile {
     }
 }
 
+class EnemyTile extends MapTile {
+    enemy: Enemy;
+
+    constructor(x: number, y: number, intro: string, description: string, type: string, image: string, enemy: Enemy){
+        super(x, y, intro, description, type, image);
+        this.enemy = enemy;
+    }
+}
+
+class EnemyTier1 extends EnemyTile {
+    constructor(x: number, y: number){
+        const enemy = getRandomTier1Enemy();
+        const intro = enemy.aliveText;
+        const description = enemy.description;
+        const image = enemy.image;
+        const type = 'EnemyTier1';
+
+        super(x, y, intro, description, type, image, enemy);
+    }
+}
+
 class ExitTile extends MapTile {
     constructor(x: number, y: number){
         let intro = 'You see a light brighter than any you\'ve seen since you awoke. '
@@ -51,5 +74,6 @@ export {
     MapTile,
     StartTile,
     EmptyRoomTile,
+    EnemyTier1,
     ExitTile
 };

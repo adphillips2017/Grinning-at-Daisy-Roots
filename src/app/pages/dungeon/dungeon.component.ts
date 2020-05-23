@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { Player } from 'src/app/classes/Player';
-import { MapTile, ExitTile, EmptyRoomTile, StartTile } from '../../classes/MapTiles';
+import { MapTile, ExitTile, EmptyRoomTile, StartTile, EnemyTier1 } from '../../classes/MapTiles';
 import { Map } from '../../models/Map';
 import { MapKey } from 'src/app/models/MapKey';
 
@@ -23,7 +23,7 @@ export class DungeonComponent implements OnInit {
 
   mapKey: MapKey = [
     ['--', 'XT', '--'],
-    ['ER', 'ST', 'ER'],
+    ['ER', 'ST', 'E1'],
     ['--', 'ER', '--']
   ];
 
@@ -55,6 +55,10 @@ export class DungeonComponent implements OnInit {
           case('ST'): {
             mapRow.push(new StartTile(x, y));
             startCoords = [x, y];
+            break;
+          }
+          case('E1'): {
+            mapRow.push(new EnemyTier1(x, y));
             break;
           }
           case('ER'): {
