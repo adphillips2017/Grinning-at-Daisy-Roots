@@ -103,7 +103,16 @@ export class Player {
     }
 
     giveItem(item: Item): void {
-        this.inventory.push(item);
+        let itemIndex = -1;
+        this.inventory.forEach((tempItem, index) => {
+            if (tempItem.label === item.label) { itemIndex = index; }
+        });
+
+        if (itemIndex > -1){
+            this.inventory[itemIndex].count += item.count;
+        }else {
+            this.inventory.push(item);
+        }
     }
 
     removeItem(item: Item): void {

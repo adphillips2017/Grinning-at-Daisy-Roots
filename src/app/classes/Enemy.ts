@@ -1,6 +1,8 @@
 import { Loot } from '../models/Loot';
 import { MoldyBread } from './Consumables';
 import { PlayerInteraction } from '../models/PlayerInteraction';
+import { Item } from './Items';
+import { pipe } from 'rxjs';
 
 class Enemy {
     private health: number;
@@ -67,13 +69,13 @@ class Enemy {
 
 class Rat extends Enemy {
     constructor() {
-        const health = getRandomInt(5) + 5;
+        const health = getRandomInt(6);
         const strength = 1;
         const defense = 0;
         const haste = 1;
         const xp = 1;
         const tier = 1;
-        const loot = [{ chance: .5, item: new MoldyBread() }];
+        const loot = [{ chance: 50, item: new MoldyBread() }];
         const aliveText = 'A rat runs out from under the wall.  You smell like cheese.';
         const deadText = 'A dead rat lies before you.  What did he ever do to you?';
         const image = 'rat.jpg';
@@ -105,5 +107,6 @@ function getRandomTier1Enemy(): Enemy {
 export {
     Enemy,
     Rat,
-    getRandomTier1Enemy
+    getRandomTier1Enemy,
+    getRandomInt
 };

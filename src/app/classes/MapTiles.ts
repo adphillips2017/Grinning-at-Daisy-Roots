@@ -45,6 +45,8 @@ class StartTile extends MapTile {
     }
 }
 
+
+
 class EmptyRoomTile extends MapTile {
     constructor(x: number, y: number){
         const intro = 'You step into a room that appears to be empty and unimportant.';

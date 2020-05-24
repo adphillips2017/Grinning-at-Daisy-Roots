@@ -5,8 +5,10 @@ import { MapTile, ExitTile, EmptyRoomTile, StartTile, EnemyTier1 } from '../../c
 import { Map } from '../../models/Map';
 import { MapKey } from 'src/app/models/MapKey';
 import { PlayerInteraction } from 'src/app/models/PlayerInteraction';
-import { Enemy } from 'src/app/classes/Enemy';
+import { Enemy, getRandomInt } from 'src/app/classes/Enemy';
 import { TerminalMessage } from 'src/app/models/TerminalMessage';
+import { Loot } from 'src/app/models/Loot';
+import { Item } from 'src/app/classes/Items';
 
 @Component({
   selector: 'app-dungeon',
@@ -167,7 +169,15 @@ export class DungeonComponent implements OnInit {
       if (!this.currentEnemy().isAlive) {
         this.output('You slayed the ' + this.currentEnemy().name + '.');
         this.output(this.currentEnemy().deadText);
+        const lootRoll = this.rollForLoot(this.currentEnemy().loot);
         this.interaction = { type: 'none', actions: []};
+
+        if (lootRoll) {
+          const lootItem = this.getLoot(this.currentEnemy().loot, lootRoll);
+          this.player.giveItem(lootItem);
+          console.log('item: ',  lootItem);
+          this.output('The ' + this.currentEnemy().name + ' dropped ' + lootItem.label + '.');
+        }
       } else {
         this.output('The ' + this.currentEnemy().name + ' has ' + this.currentEnemy().getHealth() + ' health left.');
       }
@@ -186,6 +196,31 @@ export class DungeonComponent implements OnInit {
         this.output('You have ' + this.player.getHealth() + ' health remaining.');
       }
     }
+  }
+
+  rollForLoot(possibleLoot: Loot[]): number {
+    let highChance = 0;
+
+    possibleLoot.forEach(loot => {
+      if (loot.chance > highChance) { highChance = loot.chance; }
+    });
+
+    const roll = getRandomInt(100);
+    if (roll <= highChance) { return roll; }
+    return 0;
+  }
+
+  getLoot(possibleLoot: Loot[], lootRoll: number): Item {
+    let item: Item = { label: '', count: 0, description: '' };
+    possibleLoot.forEach(loot => {
+      console.log('lootRoll of ', lootRoll, ' is <= ', loot.chance, ': ', lootRoll <= loot.chance);
+      if (lootRoll <= loot.chance) {
+        console.log('here');
+        item = loot.item;
+      }
+    });
+
+    return item;
   }
 
   help(command: string[]) {
