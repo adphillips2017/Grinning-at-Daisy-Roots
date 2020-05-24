@@ -175,7 +175,6 @@ export class DungeonComponent implements OnInit {
         if (lootRoll) {
           const lootItem = this.getLoot(this.currentEnemy().loot, lootRoll);
           this.player.giveItem(lootItem);
-          console.log('item: ',  lootItem);
           this.output('The ' + this.currentEnemy().name + ' dropped ' + lootItem.label + '.');
         }
       } else {
@@ -213,11 +212,7 @@ export class DungeonComponent implements OnInit {
   getLoot(possibleLoot: Loot[], lootRoll: number): Item {
     let item: Item = { label: '', count: 0, description: '' };
     possibleLoot.forEach(loot => {
-      console.log('lootRoll of ', lootRoll, ' is <= ', loot.chance, ': ', lootRoll <= loot.chance);
-      if (lootRoll <= loot.chance) {
-        console.log('here');
-        item = loot.item;
-      }
+      if (lootRoll <= loot.chance) { item = loot.item; }
     });
 
     return item;
