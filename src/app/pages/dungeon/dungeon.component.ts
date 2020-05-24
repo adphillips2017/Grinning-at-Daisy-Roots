@@ -176,6 +176,7 @@ export class DungeonComponent implements OnInit {
     if (this.playerActions >= this.currentEnemy().haste && this.currentEnemy().isAlive) {
       const enemyDamage = this.currentEnemy().getDamage();
       this.player.takeDamage(enemyDamage);
+      this.playerActions = 0;
       this.output('The ' + this.currentEnemy().name + ' hit you for ' + enemyDamage + ' damage.');
 
       if (!this.player.isAlive) {

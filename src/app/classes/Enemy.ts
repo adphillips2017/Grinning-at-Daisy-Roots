@@ -67,7 +67,7 @@ class Enemy {
 
 class Rat extends Enemy {
     constructor() {
-        const health = getRandomInt(5);
+        const health = getRandomInt(5) + 5;
         const strength = 1;
         const defense = 0;
         const haste = 1;

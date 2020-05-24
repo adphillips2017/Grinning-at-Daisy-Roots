@@ -29,6 +29,7 @@ export class Player {
         this.strength = 4;
         this.intelligence = 4;
         this.perception = 4;
+        this.defense = 0;
         this.luck = 2;
         this.gold = 0;
         this.x = 1;
@@ -58,13 +59,14 @@ export class Player {
 
     takeDamage(damage: number): void {
         const damageModifier = this.calculateDamageModifier();
-        this.modifyHealth(damage * damageModifier);
+        const damageAmount = damageModifier * damage * -1;
+        this.modifyHealth(damageAmount);
     }
 
     calculateDamageModifier(): number {
         const damageModifier = this.defense;
-
-        return 1 - (damageModifier * .01);
+        const damage = 1 - (damageModifier * .01);
+        return damage;
     }
 
     getInventory(): Item[] {
