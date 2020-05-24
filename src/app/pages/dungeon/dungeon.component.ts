@@ -4,6 +4,9 @@ import { Player } from 'src/app/classes/Player';
 import { MapTile, ExitTile, EmptyRoomTile, StartTile, EnemyTier1 } from '../../classes/MapTiles';
 import { Map } from '../../models/Map';
 import { MapKey } from 'src/app/models/MapKey';
+import { PlayerInteraction } from 'src/app/models/PlayerInteraction';
+import { Enemy } from 'src/app/classes/Enemy';
+import { TerminalMessage } from 'src/app/models/TerminalMessage';
 
 @Component({
   selector: 'app-dungeon',
@@ -11,18 +14,21 @@ import { MapKey } from 'src/app/models/MapKey';
   styleUrls: ['./dungeon.component.scss']
 })
 export class DungeonComponent implements OnInit {
-  player: Player = new Player();
-  messages = [];
-  currentLevel = 1;
-  playerActions = 0;
-  worldMap: Map = [];
+  player: Player;
+  messages: TerminalMessage[];
+  interaction: PlayerInteraction;
+  currentLevel: number;
+  playerActions: number;
+  worldMap: Map;
 
   helpKeywords = ['help'];
   moveKeywords = ['go', 'walk', 'travel', 'move', 'w', 'step', 'run', 'm'];
   inventoryKeywords = ['i', 'inventory'];
+  attackKeywords = ['attack', 'hit', 'strike'];
 
   mapKey: MapKey = [
     ['--', 'XT', '--'],
+    ['--', 'E1', '--'],
     ['ER', 'ST', 'E1'],
     ['--', 'ER', '--']
   ];
@@ -33,9 +39,16 @@ export class DungeonComponent implements OnInit {
   }
 
   play(): void {
+    this.player = new Player();
+    this.messages = [];
+    this.interaction = { type: 'none', actions: []};
+    this.currentLevel = 1;
+    this.playerActions = 0;
+    this.worldMap = [];
+
     this.output('Welcome to the dungeon.');
+    this.output('You open your eyes to see the dimly lit interior of a room you don\'t recognize.');
     this.createMap();
-    this.output(this.tileAt(this.player.x, this.player.y).intro);
   }
 
   createMap(): void {
@@ -81,6 +94,7 @@ export class DungeonComponent implements OnInit {
 
     this.worldMap = map;
     this.player.moveTo(startCoords[0], startCoords[1]);
+
     console.log('map: ', map);
     console.log('player', this.player);
   }
@@ -94,18 +108,82 @@ export class DungeonComponent implements OnInit {
     const command = playerInput.split(' ');
     const keyword = command[0];
 
+    if (this.interaction.type !== 'none') {
+      this.handleInteraction(this.interaction, command);
+      return;
+    }
+
     if (this.contains(keyword, this.helpKeywords)) {
       this.help(command);
+      return;
     }
     else if (this.contains(keyword, this.moveKeywords)) {
       this.move(command);
+      return;
     }
     else if (this.contains(keyword, this.inventoryKeywords)){
       this.printInventory();
+      return;
     }
     else {
       this.output('Command not recognized, please try again.');
       this.output('Type "help" for a list of commands.');
+    }
+  }
+
+  handleInteraction(interaction: PlayerInteraction, playerCommand: string[]): void {
+    switch (interaction.type) {
+      case('GameOver'): {
+        this.handleGameOver(playerCommand);
+        break;
+      }
+      case('combat'): {
+        this.handleCombat(interaction.actions, playerCommand);
+        break;
+      }
+      default: { break; }
+    }
+  }
+
+  handleGameOver(playerCommand: string[]): void {
+    if (playerCommand[0] === 'y') {
+      this.play();
+    }
+  }
+
+  gameOver() {
+    this.output('Game Over.');
+    this.output('Try again? (y/n)');
+    this.interaction = { type: 'GameOver', actions: ['restart']};
+  }
+
+  handleCombat(actions: string[], playerCommand: string[]){
+    if (this.contains(playerCommand[0], this.attackKeywords) && this.contains('attack', actions)){
+      const playerDamage = this.player.getDamage();
+      this.currentEnemy().takeDamage(playerDamage);
+      this.playerActions++;
+      this.output('You hit the ' + this.currentEnemy().name + ' for ' + playerDamage + ' damage.');
+
+      if (!this.currentEnemy().isAlive) {
+        this.output('You slayed the ' + this.currentEnemy().name + '.');
+        this.output(this.currentEnemy().deadText);
+        this.interaction = { type: 'none', actions: []};
+      } else {
+        this.output('The ' + this.currentEnemy().name + ' has ' + this.currentEnemy().getHealth() + ' health left.');
+      }
+    }
+
+    if (this.playerActions >= this.currentEnemy().haste && this.currentEnemy().isAlive) {
+      const enemyDamage = this.currentEnemy().getDamage();
+      this.player.takeDamage(enemyDamage);
+      this.output('The ' + this.currentEnemy().name + ' hit you for ' + enemyDamage + ' damage.');
+
+      if (!this.player.isAlive) {
+        this.output('You were slain by the ' + this.currentEnemy().name + '.');
+        this.gameOver();
+      } else {
+        this.output('You have ' + this.player.getHealth() + ' health remaining.');
+      }
     }
   }
 
@@ -155,30 +233,30 @@ export class DungeonComponent implements OnInit {
       if (!this.playerCanMove('north')) { return; }
       this.player.moveNorth();
       this.output(movementMessage + 'north.');
-      this.playIntro();
     }
     else if (this.contains(direction, ['down', 'south', 'backward', 'backwards', 's', 'back', 'b'])){
       if (!this.playerCanMove('south')) { return; }
       this.player.moveSouth();
       this.output(movementMessage + 'south.');
-      this.playIntro();
     }
     else if (this.contains(direction, ['right', 'east', 'e', 'r'])){
       if (!this.playerCanMove('east')) { return; }
       this.player.moveEast();
       this.output(movementMessage + 'east.');
-      this.playIntro();
     }
     else if (this.contains(direction, ['left', 'west', 'w', 'l'])){
       if (!this.playerCanMove('west')) { return; }
       this.player.moveWest();
       this.output(movementMessage + 'west.');
-      this.playIntro();
     }
     else{
       this.output('Unrecognized move direction.');
       this.output('No action taken.');
+      return;
     }
+
+    this.playIntro();
+    if (this.currentTile().type === 'ExitTile') { this.gameOver(); }
   }
 
   playerCanMove(direction: string): boolean {
@@ -222,13 +300,23 @@ export class DungeonComponent implements OnInit {
   }
 
   playIntro(): void {
-    const currentTile = this.tileAt(this.player.x, this.player.y);
+    const currentTile = this.currentTile();
     this.output(currentTile.intro);
+    this.interaction = currentTile.interaction;
+
+    if (this.currentEnemy()) {
+      if (this.currentEnemy().isAlive){ this.output(this.currentEnemy().aliveText); }
+      else { this.output(this.currentEnemy().deadText); }
+    }
   }
 
   getCurrentImage(): string {
     const image = '../../../assets/images/backgrounds/' + this.currentTile().image;
     return image;
+  }
+
+  currentEnemy(): Enemy {
+    return this.currentTile().enemy;
   }
 
   currentTile(): MapTile | undefined {

@@ -17,6 +17,7 @@ export class Player {
     level: number;
     xp: number;
     unallocatedPoints: number;
+    isAlive: boolean;
 
     constructor() {
         this.health = 100;
@@ -36,6 +37,7 @@ export class Player {
         this.level = 0;
         this.xp = 0;
         this.unallocatedPoints = 0;
+        this.isAlive = true;
     }
 
     getHealth(): number {
@@ -44,6 +46,25 @@ export class Player {
 
     modifyHealth(modifier: number): void {
         this.health = this.health + modifier;
+        if (this.health < 0) {
+            this.health = 0;
+            this.isAlive = false;
+        }
+    }
+
+    getDamage(): number {
+        return this.strength;
+    }
+
+    takeDamage(damage: number): void {
+        const damageModifier = this.calculateDamageModifier();
+        this.modifyHealth(damage * damageModifier);
+    }
+
+    calculateDamageModifier(): number {
+        const damageModifier = this.defense;
+
+        return 1 - (damageModifier * .01);
     }
 
     getInventory(): Item[] {

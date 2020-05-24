@@ -1,5 +1,6 @@
 import { Loot } from '../models/Loot';
 import { MoldyBread } from './Consumables';
+import { PlayerInteraction } from '../models/PlayerInteraction';
 
 class Enemy {
     private health: number;
@@ -14,6 +15,8 @@ class Enemy {
     deadText: string;
     image: string;
     description: string;
+    interaction: PlayerInteraction;
+    name: string;
 
     constructor(
         health: number,
@@ -26,7 +29,8 @@ class Enemy {
         aliveText: string,
         deadText: string,
         image: string,
-        description: string
+        description: string,
+        name: string
     ) {
         this.health = health;
         this.strength = strength;
@@ -40,6 +44,8 @@ class Enemy {
         this.deadText = deadText;
         this.image = image;
         this.description = description;
+        this.interaction = { type: 'combat', actions: ['attack', 'flee']};
+        this.name = name;
     }
 
     takeDamage(damage: number): void {
@@ -49,11 +55,19 @@ class Enemy {
             this.isAlive = false;
         }
     }
+
+    getHealth(): number {
+        return this.health;
+    }
+
+    getDamage(): number {
+        return this.strength;
+    }
 }
 
 class Rat extends Enemy {
     constructor() {
-        const health = getRandomInt(2);
+        const health = getRandomInt(5);
         const strength = 1;
         const defense = 0;
         const haste = 1;
@@ -64,13 +78,17 @@ class Rat extends Enemy {
         const deadText = 'A dead rat lies before you.  What did he ever do to you?';
         const image = 'rat.jpg';
         const description = 'It\'s large, for a rat.  It moves fast and irraticaly.';
+        const name = 'Rat';
 
-        super(health, strength, defense, haste, xp, tier, loot, aliveText, deadText, image, description);
+        super(health, strength, defense, haste, xp, tier, loot, aliveText, deadText, image, description, name);
     }
 }
 
 function getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max));
+    const randomNumber = Math.floor(Math.random() * Math.floor(max));
+    if (randomNumber < 1) { return 1; }
+
+    return randomNumber;
 }
 
 function getRandomTier1Enemy(): Enemy {
@@ -78,7 +96,7 @@ function getRandomTier1Enemy(): Enemy {
     const roll = getRandomInt(tier1Count);
 
     switch (roll){
-        case(0): {
+        case(1): {
             return new Rat();
         }
     }
