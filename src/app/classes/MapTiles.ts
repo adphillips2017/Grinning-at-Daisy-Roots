@@ -40,7 +40,7 @@ class StartTile extends MapTile {
         const intro = 'You step into a room that appears to be empty but you recognize it as the room you first awoke in.';
         const description = 'The room appears to be empty.';
         const type = 'StartTile';
-        const image = 'starting-tile.jpg';
+        const image = 'starting-tile-desk.png';
         super(x, y, intro, description, type, image);
     }
 }

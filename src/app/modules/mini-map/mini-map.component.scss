@@ -1,5 +1,5 @@
 .mini-map {
-    border: .5px solid black;
+    border: 10px solid black;
 
     .map-row {
         display: flex;
@@ -27,8 +27,8 @@
             }
         }
         .room {
-            background-color: lightgray;
-            border: 1px solid lightgray;
+            background-color: white;
+            border: 1px solid white;
         }
         .player-tile {
             border: 1px dashed black;

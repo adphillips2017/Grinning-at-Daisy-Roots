@@ -37,8 +37,7 @@ export class DungeonComponent implements OnInit {
     ['--', 'ER', '--']
   ];
 
-
-  ngOnInit(){
+  ngOnInit() {
     this.play();
   }
 

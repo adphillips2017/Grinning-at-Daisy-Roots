@@ -12,25 +12,18 @@
             text-align: center;
 
             .main-image {
-                height: 50vh;
-                width: auto;
+                width: 100%;
+                border: 10px solid black;
             }
 
             .terminal {
                 margin-top: 2rem;
                 font: 1rem Inconsolata, monospace;
                 text-align: left;
+                background-color: white;
+                width: 100%;
+                border: 10px solid black;
             }
-        }
-
-        .temp-main-display {
-            height: 31rem;
-            width: 100%;
-        }
-
-        .temp-map {
-            height: 24rem;
-            width: 24rem;
         }
     }
 }
