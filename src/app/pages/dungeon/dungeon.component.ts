@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { Player } from 'src/app/classes/Player';
 import { MapTile, ExitTile, EmptyRoomTile, StartTile, EnemyTier1 } from '../../classes/MapTiles';
@@ -9,6 +9,7 @@ import { Enemy, getRandomInt } from 'src/app/classes/Enemy';
 import { TerminalMessage } from 'src/app/models/TerminalMessage';
 import { Loot } from 'src/app/models/Loot';
 import { Item } from 'src/app/classes/Items';
+import { MiniMapComponent } from 'src/app/modules/mini-map/mini-map.component';
 
 @Component({
   selector: 'app-dungeon',
@@ -16,6 +17,7 @@ import { Item } from 'src/app/classes/Items';
   styleUrls: ['./dungeon.component.scss']
 })
 export class DungeonComponent implements OnInit {
+  @ViewChild(MiniMapComponent) miniMap: MiniMapComponent;
   player: Player;
   messages: TerminalMessage[];
   interaction: PlayerInteraction;
@@ -180,6 +182,8 @@ export class DungeonComponent implements OnInit {
       } else {
         this.output('The ' + this.currentEnemy().name + ' has ' + this.currentEnemy().getHealth() + ' health left.');
       }
+    } else {
+      this.output('You cannot do that now. You are in combat.');
     }
 
     if (this.playerActions >= this.currentEnemy().haste && this.currentEnemy().isAlive) {
@@ -286,6 +290,7 @@ export class DungeonComponent implements OnInit {
       return;
     }
 
+    this.miniMap.generateMiniMap();
     this.playIntro();
     if (this.currentTile().type === 'ExitTile') { this.gameOver(); }
   }

@@ -1,8 +1,6 @@
 import { Loot } from '../models/Loot';
 import { MoldyBread } from './Consumables';
 import { PlayerInteraction } from '../models/PlayerInteraction';
-import { Item } from './Items';
-import { pipe } from 'rxjs';
 
 class Enemy {
     private health: number;

@@ -1,0 +1,37 @@
+.mini-map {
+    border: .5px solid black;
+
+    .map-row {
+        display: flex;
+        flex-direction: row;
+
+        .map-tile {
+            height: 5rem;
+            width: 5rem;
+            background-color: black;
+            border: 1px solid black;
+
+            .player {
+                margin-top: 2rem;
+                text-align: center;
+            }
+            .north { text-align: center; }
+            .west { margin-top: 2rem; }
+            .east {
+                margin-top: 2rem;
+                text-align: right;
+            }
+            .south {
+                text-align: center;
+                margin-top: 4rem;
+            }
+        }
+        .room {
+            background-color: lightgray;
+            border: 1px solid lightgray;
+        }
+        .player-tile {
+            border: 1px dashed black;
+        }
+    }
+}
