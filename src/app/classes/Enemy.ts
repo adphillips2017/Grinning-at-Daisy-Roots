@@ -1,6 +1,7 @@
 import { Loot } from '../models/Loot';
-import { MoldyBread } from './Consumables';
+import { StaleBread } from './Consumables';
 import { PlayerInteraction } from '../models/PlayerInteraction';
+import { Teeth } from './Items';
 
 class Enemy {
     private health: number;
@@ -76,7 +77,10 @@ class Arachnid extends Enemy {
         const haste = 1;
         const xp = 5;
         const tier = 1;
-        const loot = [{ chance: 50, item: new MoldyBread() }];
+        const loot = [
+            { chance: 15, item: new Teeth() },
+            { chance: 60, item: new StaleBread() }
+        ];
         const aliveText = 'A large arachnid looking creature appears to defend its nest.';
         const deadText = 'The dead carcass of an arachnid lies in the center of the room.';
         const imageDead = 'arachnid-dead.png';

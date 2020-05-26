@@ -1,6 +1,6 @@
 import { Item } from './Items';
 import { RustyDagger } from './Weapons';
-import { MoldyBread } from './Consumables';
+import { StaleBread } from './Consumables';
 
 export class Player {
     private health: number;
@@ -22,8 +22,7 @@ export class Player {
     constructor() {
         this.health = 100;
         this.inventory = [
-            new MoldyBread(),
-            new Item('Lockpick', 3, 'Small metal tool used to open locks.  Break easily.'),
+            new StaleBread(),
             new RustyDagger()
         ];
         this.strength = 4;
