@@ -27,11 +27,13 @@
             }
         }
         .room {
-            background-color: white;
-            border: 1px solid white;
+            background-image: url('../../../assets/images/mini-map/floor.png');
+            background-size: cover;
+            border: 1px solid black;
+            color: white;
         }
         .player-tile {
-            border: 1px dashed black;
+            border: 1px dashed white;
         }
     }
 }

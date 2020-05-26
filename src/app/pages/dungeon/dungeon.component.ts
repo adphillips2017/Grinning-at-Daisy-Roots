@@ -49,8 +49,10 @@ export class DungeonComponent implements OnInit {
     this.playerActions = 0;
     this.worldMap = [];
 
-    this.output('Welcome to the dungeon.');
-    this.output('You open your eyes to see the dimly lit interior of a room you don\'t recognize.');
+    this.output('Welcome home.');
+    this.output('You open your eyes and find yourself hunched over a messy desk, the hard cheery wood cool against your face.')
+    this.output('As you sit up your eyes adjust to the light and you begin to see the dimly lit interior of a room you don\'t recognize.');
+
     this.createMap();
   }
 
@@ -171,6 +173,7 @@ export class DungeonComponent implements OnInit {
         this.output('You slayed the ' + this.currentEnemy().name + '.');
         this.output(this.currentEnemy().deadText);
         const lootRoll = this.rollForLoot(this.currentEnemy().loot);
+        this.currentTile().imageState = 2;
         this.interaction = { type: 'none', actions: []};
 
         if (lootRoll) {
@@ -194,8 +197,6 @@ export class DungeonComponent implements OnInit {
       if (!this.player.isAlive) {
         this.output('You were slain by the ' + this.currentEnemy().name + '.');
         this.gameOver();
-      } else {
-        this.output('You have ' + this.player.getHealth() + ' health remaining.');
       }
     }
   }
@@ -346,7 +347,7 @@ export class DungeonComponent implements OnInit {
   }
 
   getCurrentImage(): string {
-    const image = '../../../assets/images/backgrounds/' + this.currentTile().image;
+    const image = '../../../assets/images/backgrounds/' + this.currentTile().images[this.currentTile().imageState];
     return image;
   }
 

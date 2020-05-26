@@ -13,7 +13,8 @@ class Enemy {
     loot: Loot[];
     aliveText: string;
     deadText: string;
-    image: string;
+    imageAlive: string;
+    imageDead: string;
     description: string;
     interaction: PlayerInteraction;
     name: string;
@@ -28,7 +29,8 @@ class Enemy {
         loot: Loot[],
         aliveText: string,
         deadText: string,
-        image: string,
+        imageAlive: string,
+        imageDead: string,
         description: string,
         name: string
     ) {
@@ -42,7 +44,8 @@ class Enemy {
         this.loot = loot;
         this.aliveText = aliveText;
         this.deadText = deadText;
-        this.image = image;
+        this.imageAlive = imageAlive;
+        this.imageDead = imageDead;
         this.description = description;
         this.interaction = { type: 'combat', actions: ['attack', 'flee']};
         this.name = name;
@@ -65,22 +68,23 @@ class Enemy {
     }
 }
 
-class Rat extends Enemy {
+class Arachnid extends Enemy {
     constructor() {
-        const health = getRandomInt(6);
+        const health = getRandomInt(10) + 4;
         const strength = 1;
         const defense = 0;
         const haste = 1;
-        const xp = 1;
+        const xp = 5;
         const tier = 1;
         const loot = [{ chance: 50, item: new MoldyBread() }];
-        const aliveText = 'A rat runs out from under the wall.  You smell like cheese.';
-        const deadText = 'A dead rat lies before you.  What did he ever do to you?';
-        const image = 'rat.jpg';
-        const description = 'It\'s large, for a rat.  It moves fast and irraticaly.';
-        const name = 'Rat';
+        const aliveText = 'A large arachnid looking creature appears to defend its nest.';
+        const deadText = 'The dead carcass of an arachnid lies in the center of the room.';
+        const imageDead = 'arachnid-dead.png';
+        const imageAlive = 'arachnid-alive.png';
+        const description = 'The arachnid is surprisingly quick for its size.';
+        const name = 'Arachnid';
 
-        super(health, strength, defense, haste, xp, tier, loot, aliveText, deadText, image, description, name);
+        super(health, strength, defense, haste, xp, tier, loot, aliveText, deadText, imageAlive, imageDead, description, name);
     }
 }
 
@@ -97,14 +101,14 @@ function getRandomTier1Enemy(): Enemy {
 
     switch (roll){
         case(1): {
-            return new Rat();
+            return new Arachnid();
         }
     }
 }
 
 export {
     Enemy,
-    Rat,
+    Arachnid,
     getRandomTier1Enemy,
     getRandomInt
 };
