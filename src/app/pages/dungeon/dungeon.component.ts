@@ -34,6 +34,7 @@ export class DungeonComponent implements OnInit {
   equipKeywords = ['equip', 'e'];
   unequipKeywords = ['unequip', 'u'];
   useKeywords = ['use'];
+  inspectKeywords = ['inspect', 'examine', 'look'];
 
   mapKey: MapKey = [
     ['--', 'XT', '--'],
@@ -144,10 +145,60 @@ export class DungeonComponent implements OnInit {
     else if (this.contains(keyword, this.useKeywords)) {
       this.useItem(command);
     }
+    else if (this.contains(keyword, this.inspectKeywords)) {
+      this.inspect(command);
+    }
     else {
       this.output('Command not recognized, please try again.');
       this.output('Type "help" for a list of commands.');
     }
+  }
+
+  inspect(command: string[]): void {
+    console.log('command: ', command);
+    if (!command[1]) {
+      this.output('You must inspect something, you cannot just inspect.');
+      return;
+    }
+
+    if (this.interaction.type === 'combat') {
+      this.player.incrementActionCount();
+    }
+
+    if (command[1] === 'enemy') {
+      if (this.currentTile().enemy){
+        this.output(this.currentEnemy().description);
+        return;
+      }
+      else {
+        this.output('There is no enemy to inspect.');
+        this.output('That you can see, anyway...');
+        return;
+      }
+    }
+    else if (command[1] === 'room') {
+      this.output(this.currentTile().description);
+      return;
+    }
+
+    let inspectChoice;
+
+    if (command[2]){
+      if (command[1] === 'equipment') {
+        inspectChoice = parseInt(command[2], 10);
+        if (isNaN(inspectChoice)) {this.output('Invalid inspect choice given.'); }
+        else if (inspectChoice > this.player.getEquippedItems().length) { this.output('Equipment selection out of range.'); }
+        else { this.output(this.player.getEquippedItems()[inspectChoice - 1].description); }
+      } else {
+        this.output('Unknown inspect command given.');
+      }
+      return;
+    }
+
+    inspectChoice = parseInt(command[1], 10);
+    if (isNaN(inspectChoice)) {this.output('Invalid inspect choice given.'); }
+    else if (inspectChoice > this.player.getInventory().length) { this.output('Item selection out of range.'); }
+    else { this.output(this.player.getInventory()[inspectChoice - 1].description); }
   }
 
   useItem(command: string[]): void {
@@ -194,10 +245,11 @@ export class DungeonComponent implements OnInit {
 
     const equipChoice = parseInt(command[1], 10);
     if (isNaN(equipChoice)) { this.output('Invalid equip choice given.'); }
-    if (equipChoice > this.player.getInventory().length) { this.output('Item selection out of range.'); }
-
-    const equipItem: any = this.player.getInventory()[equipChoice - 1];
-    this.output(this.player.equipItem(equipItem));
+    else if (equipChoice > this.player.getInventory().length) { this.output('Item selection out of range.'); }
+    else {
+      const equipItem: any = this.player.getInventory()[equipChoice - 1];
+      this.output(this.player.equipItem(equipItem));
+    }
   }
 
   unequipItem(command: string[]): void {
@@ -218,10 +270,11 @@ export class DungeonComponent implements OnInit {
 
     const unequipChoice = parseInt(command[1], 10);
     if (isNaN(unequipChoice)) { this.output('Invalid unequip choice given.'); }
-    if (unequipChoice > this.player.getEquippedItems().length) { this.output('Equipment selection out of range.'); }
-
-    const equipItem: any = this.player.getEquippedItems()[unequipChoice - 1];
-    this.output(this.player.unequipItem(equipItem));
+    else if (unequipChoice > this.player.getEquippedItems().length) { this.output('Equipment selection out of range.'); }
+    else {
+      const equipItem: any = this.player.getEquippedItems()[unequipChoice - 1];
+      this.output(this.player.unequipItem(equipItem));
+    }
   }
 
   handleInteraction(interaction: PlayerInteraction, playerCommand: string[]): void {
@@ -278,7 +331,16 @@ export class DungeonComponent implements OnInit {
       } else {
         this.output('The ' + this.currentEnemy().name + ' has ' + this.currentEnemy().getHealth() + ' health left.');
       }
-    } else {
+    }
+    else if (playerCommand[1]) {
+      if (this.contains(playerCommand[0], this.inspectKeywords) && this.contains('inspect', actions)) {
+        this.inspect(playerCommand);
+      }
+      else {
+        this.output('You cannot do that now. You are in combat....');
+      }
+    }
+    else {
       this.output('You cannot do that now. You are in combat.');
     }
 

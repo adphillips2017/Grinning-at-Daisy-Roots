@@ -69,7 +69,7 @@ class EnemyTier1 extends MapTile {
     constructor(x: number, y: number){
         const enemy = getRandomTier1Enemy();
         const intro = 'You step into a room that appears to be the nesting grounds of some small creature.';
-        const description = enemy.description;
+        const description = 'The room is surprisingly clean considering there is a remarkable nest in one corner.';
         const imageState = 1;
         const images = {
             1: enemy.imageAlive,

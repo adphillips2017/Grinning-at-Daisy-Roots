@@ -48,7 +48,7 @@ class Enemy {
         this.imageAlive = imageAlive;
         this.imageDead = imageDead;
         this.description = description;
-        this.interaction = { type: 'combat', actions: ['attack', 'flee']};
+        this.interaction = { type: 'combat', actions: ['attack', 'flee', 'inspect']};
         this.name = name;
     }
 
