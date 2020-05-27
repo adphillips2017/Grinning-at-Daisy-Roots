@@ -1,0 +1,10 @@
+<div class="commands-helper">
+    <div class="command" *ngFor="let command of commands">
+        <div class="command-label">{{ command.label }}</div>
+        <div class="help-text">{{ command.helpText }}</div>
+        <div class="alias-label">Command Aliases</div>
+        <div class="aliases-list">
+            <ul><li class="alias" *ngFor="let alias of command.aliases">{{ alias }}</li></ul>
+        </div>
+    </div>
+</div>

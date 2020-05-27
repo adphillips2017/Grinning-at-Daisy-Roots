@@ -32,8 +32,8 @@ export class DungeonComponent implements OnInit {
   inventoryKeywords = ['i', 'inventory'];
   attackKeywords = ['attack', 'hit', 'strike'];
   equipKeywords = ['equip', 'e'];
-  unequipKeywords = ['unequip', 'u'];
-  useKeywords = ['use'];
+  unequipKeywords = ['unequip', 'un'];
+  useKeywords = ['use', 'u'];
   inspectKeywords = ['inspect', 'examine', 'look'];
   fleeKeywords = ['flee'];
   northKeywords = ['up', 'north', 'forward', 'straight', 'n', 'forwards', 'f'];

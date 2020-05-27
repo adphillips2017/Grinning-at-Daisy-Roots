@@ -6,6 +6,6 @@
 
     <div class="content">
         <app-inventory-manager *ngIf="activeTab === 'inventory'; else commandPanel" [player]="player"></app-inventory-manager>
-        <ng-template #commandPanel>Command Panel</ng-template>
+        <ng-template #commandPanel><app-commands-helper></app-commands-helper></ng-template>
     </div>
 </div>

@@ -1,5 +1,6 @@
 .information-panel {
     margin-top: 2rem;
+    width: 16.5rem;
 
     .tabs {
         display: flex;
@@ -19,6 +20,7 @@
                 color: black;
                 border: 10px solid black;
                 border-bottom: none;
+                z-index: 1;
             }
         }
     }
