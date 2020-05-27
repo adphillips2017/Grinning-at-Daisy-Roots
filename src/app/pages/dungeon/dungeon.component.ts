@@ -10,6 +10,8 @@ import { TerminalMessage } from 'src/app/models/TerminalMessage';
 import { Loot } from 'src/app/models/Loot';
 import { Item } from 'src/app/classes/Items';
 import { MiniMapComponent } from 'src/app/modules/mini-map/mini-map.component';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { Equipment } from 'src/app/classes/Equipment';
 
 @Component({
   selector: 'app-dungeon',
@@ -29,6 +31,8 @@ export class DungeonComponent implements OnInit {
   moveKeywords = ['go', 'walk', 'travel', 'move', 'w', 'step', 'run', 'm'];
   inventoryKeywords = ['i', 'inventory'];
   attackKeywords = ['attack', 'hit', 'strike'];
+  equipKeywords = ['equip', 'e'];
+  unequipKeywords = ['unequip', 'u'];
 
   mapKey: MapKey = [
     ['--', 'XT', '--'],
@@ -101,7 +105,6 @@ export class DungeonComponent implements OnInit {
     this.player.moveTo(startCoords[0], startCoords[1]);
 
     console.log('map: ', map);
-    console.log('player', this.player);
   }
 
   issueCommand(playerInput: string): void {
@@ -115,25 +118,74 @@ export class DungeonComponent implements OnInit {
 
     if (this.interaction.type !== 'none') {
       this.handleInteraction(this.interaction, command);
-      return;
     }
 
     if (this.contains(keyword, this.helpKeywords)) {
       this.help(command);
-      return;
     }
     else if (this.contains(keyword, this.moveKeywords)) {
       this.move(command);
-      return;
     }
-    else if (this.contains(keyword, this.inventoryKeywords)){
+    else if (this.contains(keyword, this.inventoryKeywords)) {
       this.printInventory();
-      return;
+    }
+    else if (this.contains(keyword, this.equipKeywords)) {
+      this.equipItem(command);
+    }
+    else if (this.contains(keyword, this.unequipKeywords)) {
+      this.unequipItem(command);
     }
     else {
       this.output('Command not recognized, please try again.');
       this.output('Type "help" for a list of commands.');
     }
+  }
+
+  equipItem(command: string[]): void {
+    if (!command[1]) {
+      if (this.player.equipmentInInventory().length < 1) {
+        this.output('No equipable items in inventory.  Perhaps I should be more observant as I explore.');
+        return;
+      }
+      this.output('Equip action requires the Inventory Number of the item you wish to equip.  Equipable items:');
+      let itemIndex = 1;
+      this.player.equipmentInInventory().forEach(item => {
+          this.output(itemIndex + '. ' + item.label);
+          itemIndex++;
+      });
+      return;
+    }
+
+    const equipChoice = parseInt(command[1], 10);
+    if (isNaN(equipChoice)) { this.output('Invalid equip choice given.'); }
+    if (equipChoice > this.player.getInventory().length) { this.output('Item selection out of range.'); }
+
+    const equipItem: any = this.player.getInventory()[equipChoice - 1];
+    this.output(this.player.equipItem(equipItem));
+  }
+
+  unequipItem(command: string[]): void {
+    if (!command[1]) {
+      if (this.player.getEquippedItems().length < 1) {
+        this.output('No items currently equipped.');
+        return;
+      }
+
+      this.output('Unequip action requires the Equipment Number of the item you wish to equip.  Equipment:');
+      let itemIndex = 1;
+      this.player.getEquippedItems().forEach(item => {
+          this.output(itemIndex + '. ' + item.label);
+          itemIndex++;
+      });
+      return;
+    }
+
+    const unequipChoice = parseInt(command[1], 10);
+    if (isNaN(unequipChoice)) { this.output('Invalid unequip choice given.'); }
+    if (unequipChoice > this.player.getEquippedItems().length) { this.output('Equipment selection out of range.'); }
+
+    const equipItem: any = this.player.getEquippedItems()[unequipChoice - 1];
+    this.output(this.player.unequipItem(equipItem));
   }
 
   handleInteraction(interaction: PlayerInteraction, playerCommand: string[]): void {
@@ -328,11 +380,11 @@ export class DungeonComponent implements OnInit {
     const inventory = this.player.getInventory();
     this.output('You currently have: ');
 
+    let displayIndex = 1;
     inventory.forEach(item => {
-      this.output('* ' + item.label + '  x' + item.count);
+      this.output(displayIndex + '. ' + item.label + '  x' + item.count);
+      displayIndex++;
     });
-
-    this.output('* Gold  x' + this.player.gold);
   }
 
   playIntro(): void {

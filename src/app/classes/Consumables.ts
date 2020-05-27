@@ -1,10 +1,5 @@
 import { Item } from './Items';
-
-interface Effect {
-    stat: string;
-    modifier: number;
-}
-
+import { Effect } from '../models/Effect';
 class Consumable extends Item {
     effects: Effect[];
     useText: string;
@@ -20,7 +15,7 @@ class Consumable extends Item {
 class StaleBread extends Consumable {
     constructor(){
         const label = 'Stale Bread';
-        const description = 'Bread so old and hard it might be used as a weapon.';
+        const description = 'Bread so old and hard it might be used as a weapon, nevertheless it appears invigorating.';
         const effects = [{ stat: 'stamina', modifier: 5}];
         let useText = 'You attempt to bite into the bread with your front teeth but feel as though they might break. ';
         useText += 'You resort to skipping the incisors entirely and go straight to the molars. It crunches like rock candy but you get it down. ';
@@ -43,13 +38,16 @@ class EmptyVial extends Consumable {
 }
 
 class BloodVial extends Consumable {
-    constructor(){
-        const label = 'Blood Vial';
+    constructor(age: number){
+        const label = 'Blood Vial (' + age + ')';
         let description = 'A vial of your own blood.  Deep red in color, it makes you feel safer for having it. ';
         description += 'Readministering the blood will heal some ailments.  It gets more potent over time.';
-        const effects = [{ stat: 'health', modifier: 0 }, { stat: 'strength', modifier: 0 }];
+        const healthModifier = 2 * age;
+        const strengthModifier = healthModifier >= 20 ? 5 : 0;
+        const effects = [{ stat: 'health', modifier: healthModifier }, { stat: 'strength', modifier: strengthModifier }];
         let useText = 'You reattach the surgical tube and needle to the bottle before inserting the needle into your arm.';
         useText += ' As you raise the bottle above your head you feel the warmth of the blood entering your arm. The rush is intoxicating.';
+        if (age === 1) { useText = 'You inject the blood just as you\'ve done a hundred times before, but the reassuring rush of warmth never comes.  It\'s maddening.  Perhaps in your haste you have robbed it of its potency?'; }
 
         super(label, description, effects, useText);
     }

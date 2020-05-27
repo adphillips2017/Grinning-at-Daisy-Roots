@@ -1,4 +1,5 @@
 import { Item } from './Items';
+import { Equipment, PlainMensBoots } from './Equipment';
 import { RustyDagger } from './Weapons';
 import { StaleBread } from './Consumables';
 
@@ -8,7 +9,10 @@ export class Player {
     private xpLevels: number[];
     x: number;
     y: number;
+    maxHealth: number;
+    maxStamina: number;
     strength: number;
+    stamina: number;
     intelligence: number;
     perception: number;
     defense: number;
@@ -18,19 +22,23 @@ export class Player {
     xp: number;
     unallocatedPoints: number;
     isAlive: boolean;
+    private equipment: Equipment[];
 
     constructor() {
+        this.maxHealth = 100;
         this.health = 100;
+        this.equipment = [];
         this.inventory = [
-            new StaleBread(),
-            new RustyDagger()
+            new PlainMensBoots(),
+            new StaleBread()
         ];
         this.strength = 4;
+        this.maxStamina = 25;
+        this.stamina = 25;
         this.intelligence = 4;
         this.perception = 4;
         this.defense = 0;
         this.luck = 2;
-        this.gold = 0;
         this.x = 1;
         this.y = 2;
         this.xpLevels = [5, 7, 10, 15, 20];
@@ -38,6 +46,115 @@ export class Player {
         this.xp = 0;
         this.unallocatedPoints = 0;
         this.isAlive = true;
+    }
+
+    getEquippedItems(): Equipment[] {
+        return this.equipment;
+    }
+
+    equipmentInInventory(): Equipment[] {
+        const equipment: Equipment[] = [];
+
+        this.getInventory().forEach(item => {
+            if (item instanceof Equipment) { equipment.push(item); }
+        });
+
+        return equipment;
+    }
+
+    equipmentInSlot(slot: string): Equipment {
+        return this.equipment.find(item => slot === item.slot);
+    }
+
+    equipItem(item: Equipment): string {
+        if (!(item instanceof Equipment)) { return 'This item is not equipable.'; }
+
+        let responseMessage = '';
+        if (this.equipmentInSlot(item.slot)) {
+            responseMessage += this.unequipItem(this.equipmentInSlot(item.slot));
+        }
+        this.removeItem(item);
+        this.equipment.push(item);
+        item.effects.forEach(effect => {
+            switch (effect.stat) {
+                case('max-health'): {
+                    this.maxHealth += effect.modifier;
+                    break;
+                }
+                case('strength'): {
+                    this.strength += effect.modifier;
+                    break;
+                }
+                case('max-stamina'): {
+                    this.maxStamina += effect.modifier;
+                    break;
+                }
+                case('intelligence'): {
+                    this.intelligence += effect.modifier;
+                    break;
+                }
+                case('perception'): {
+                    this.perception += effect.modifier;
+                    break;
+                }
+                case('defense'): {
+                    this.defense += effect.modifier;
+                    break;
+                }
+                case('luck'): {
+                    this.luck += effect.modifier;
+                    break;
+                }
+                default: {
+                    console.warn('Item with unknown equipment stat: ', item);
+                }
+            }
+        });
+
+        return responseMessage += 'Equipped ' + item.label;
+    }
+
+    unequipItem(item: Equipment): string {
+        if (this.equipment.indexOf(item) < 0) { return item.label + ' is not currently equipped.'; }
+        this.inventory.unshift(item);
+        this.equipment.splice(this.equipment.indexOf(item), 1);
+        item.effects.forEach(effect => {
+            switch (effect.stat) {
+                case('max-health'): {
+                    this.maxHealth -= effect.modifier;
+                    break;
+                }
+                case('strength'): {
+                    this.strength -= effect.modifier;
+                    break;
+                }
+                case('max-stamina'): {
+                    this.maxStamina -= effect.modifier;
+                    break;
+                }
+                case('intelligence'): {
+                    this.intelligence -= effect.modifier;
+                    break;
+                }
+                case('perception'): {
+                    this.perception -= effect.modifier;
+                    break;
+                }
+                case('defense'): {
+                    this.defense -= effect.modifier;
+                    break;
+                }
+                case('luck'): {
+                    this.luck -= effect.modifier;
+                    break;
+                }
+                default: {
+                    console.warn('Item with unknown equipment stat: ', item);
+                }
+            }
+        });
+
+        return 'Unequipped ' + item.label + '.';
     }
 
     getHealth(): number {
@@ -109,25 +226,31 @@ export class Player {
 
         if (itemIndex > -1){
             this.inventory[itemIndex].count += item.count;
+            return;
+        }
+
+        if (item instanceof Equipment) {
+            this.inventory.unshift(item);
         }else {
             this.inventory.push(item);
         }
     }
 
     removeItem(item: Item): void {
-        if (this.inventory.indexOf(item) >= 0){ return; }
+        if (this.inventory.indexOf(item) < 0){ return; }
         this.inventory.splice(this.inventory.indexOf(item), 1);
     }
 
     getStats(): unknown[] {
         return [
             { label: 'Health', value: this.getHealth()},
+            { label: 'Stamina', value: this.stamina },
+            { label: 'Defense', value: this.defense },
             { label: 'Strength', value: this.strength },
             { label: 'Intelligence', value: this.intelligence },
             { label: 'Perception', value: this.perception },
             { label: 'Luck', value: this.luck },
-            { label: 'Inventory', value: this.getInventoryCount() },
-            { label: 'Gold', value: this.gold },
+            { label: 'Inventory', value: this.getInventoryCount() }
         ];
     }
 
