@@ -19,6 +19,7 @@ class Enemy {
     description: string;
     interaction: PlayerInteraction;
     name: string;
+    fleeChance: number;
 
     constructor(
         health: number,
@@ -33,7 +34,8 @@ class Enemy {
         imageAlive: string,
         imageDead: string,
         description: string,
-        name: string
+        name: string,
+        fleeChance: number
     ) {
         this.health = health;
         this.strength = strength;
@@ -50,6 +52,7 @@ class Enemy {
         this.description = description;
         this.interaction = { type: 'combat', actions: ['attack', 'flee', 'inspect']};
         this.name = name;
+        this.fleeChance = fleeChance;
     }
 
     takeDamage(damage: number): void {
@@ -87,8 +90,9 @@ class Arachnid extends Enemy {
         const imageAlive = 'arachnid-alive.png';
         const description = 'The arachnid is surprisingly quick for its size.';
         const name = 'Arachnid';
+        const fleeChance = 50;
 
-        super(health, strength, defense, haste, xp, tier, loot, aliveText, deadText, imageAlive, imageDead, description, name);
+        super(health, strength, defense, haste, xp, tier, loot, aliveText, deadText, imageAlive, imageDead, description, name, fleeChance);
     }
 }
 

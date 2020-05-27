@@ -49,6 +49,10 @@ export class Player {
         this.temporaryEffects = [];
     }
 
+    getLuckModifier(): number {
+        return (this.luck * .02) + 1;
+    }
+
     getActionCount(): number {
         return this.actionCount;
     }
@@ -71,7 +75,6 @@ export class Player {
                 this.removeEffect(effect);
             }
         });
-        // remove stat bonuses
     }
 
     ageBloodVials(): void {

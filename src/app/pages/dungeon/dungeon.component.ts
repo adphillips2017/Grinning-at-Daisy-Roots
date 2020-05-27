@@ -35,6 +35,11 @@ export class DungeonComponent implements OnInit {
   unequipKeywords = ['unequip', 'u'];
   useKeywords = ['use'];
   inspectKeywords = ['inspect', 'examine', 'look'];
+  fleeKeywords = ['flee'];
+  northKeywords = ['up', 'north', 'forward', 'straight', 'n', 'forwards', 'f'];
+  southKeywords = ['down', 'south', 'backward', 'backwards', 's', 'back', 'b'];
+  eastKeywords = ['right', 'east', 'e', 'r'];
+  westKeywords = ['left', 'west', 'w', 'l'];
 
   mapKey: MapKey = [
     ['--', 'XT', '--'],
@@ -148,6 +153,9 @@ export class DungeonComponent implements OnInit {
     else if (this.contains(keyword, this.inspectKeywords)) {
       this.inspect(command);
     }
+    else if (this.contains(keyword, this.fleeKeywords)) {
+      if (this.attemptToFlee(command)) { this.flee(command); }
+    }
     else {
       this.output('Command not recognized, please try again.');
       this.output('Type "help" for a list of commands.');
@@ -159,10 +167,6 @@ export class DungeonComponent implements OnInit {
     if (!command[1]) {
       this.output('You must inspect something, you cannot just inspect.');
       return;
-    }
-
-    if (this.interaction.type === 'combat') {
-      this.player.incrementActionCount();
     }
 
     if (command[1] === 'enemy') {
@@ -220,12 +224,19 @@ export class DungeonComponent implements OnInit {
     }
 
     const useChocie = parseInt(command[1], 10);
-    if (isNaN(useChocie)) { this.output('Invalid use choice given.'); }
-    if (useChocie > this.player.getInventory().length) { this.output('Item selection out of range.'); }
+    if (isNaN(useChocie)) {
+      this.output('Invalid use choice given.');
+      return;
+    }
+    else if (useChocie > this.player.getInventory().length) {
+      this.output('Item selection out of range.');
+      return;
+    }
 
     const useItem: any = this.player.getInventory()[useChocie - 1];
     this.output(this.player.useItem(useItem));
     if (useItem instanceof EmptyVial) { this.output(this.player.giveItem(new BloodVial())); }
+    if (this.interaction.type === 'combat') { this.player.incrementActionCount(); }
   }
 
   equipItem(command: string[]): void {
@@ -250,6 +261,7 @@ export class DungeonComponent implements OnInit {
       const equipItem: any = this.player.getInventory()[equipChoice - 1];
       this.output(this.player.equipItem(equipItem));
     }
+    if (this.interaction.type === 'combat') { this.player.incrementActionCount(); }
   }
 
   unequipItem(command: string[]): void {
@@ -275,6 +287,7 @@ export class DungeonComponent implements OnInit {
       const equipItem: any = this.player.getEquippedItems()[unequipChoice - 1];
       this.output(this.player.unequipItem(equipItem));
     }
+    if (this.interaction.type === 'combat') { this.player.incrementActionCount(); }
   }
 
   handleInteraction(interaction: PlayerInteraction, playerCommand: string[]): void {
@@ -332,12 +345,27 @@ export class DungeonComponent implements OnInit {
         this.output('The ' + this.currentEnemy().name + ' has ' + this.currentEnemy().getHealth() + ' health left.');
       }
     }
+    else if (this.contains(playerCommand[0], this.fleeKeywords) && this.contains('flee', actions)) {
+      if (this.attemptToFlee(playerCommand)) {
+        this.flee(playerCommand);
+        return;
+      }
+    }
     else if (playerCommand[1]) {
       if (this.contains(playerCommand[0], this.inspectKeywords) && this.contains('inspect', actions)) {
         this.inspect(playerCommand);
       }
+      else if (this.contains(playerCommand[0], this.useKeywords)) {
+        this.useItem(playerCommand);
+      }
+      else if (this.contains(playerCommand[0], this.equipKeywords)) {
+        this.equipItem(playerCommand);
+      }
+      else if (this.contains(playerCommand[0], this.unequipKeywords)) {
+        this.unequipItem(playerCommand);
+      }
       else {
-        this.output('You cannot do that now. You are in combat....');
+        this.output('You cannot do that now. You are in combat.');
       }
     }
     else {
@@ -355,6 +383,41 @@ export class DungeonComponent implements OnInit {
         this.gameOver();
       }
     }
+  }
+
+  flee(command: string[]): void {
+    this.player.resetActionCount();
+    this.interaction = { type: 'none', actions: [] };
+    this.move(command, 'You manage to escape and run ');
+  }
+
+  attemptToFlee(command: string[]): boolean {
+    if (this.interaction.type !== 'combat') {
+      this.output('You have nothing to flee from. (That you can see.)');
+      return false;
+    }
+
+    if (!command[1]) {
+      this.output('Flee command requires a direction to run.');
+      return false;
+    }
+
+    this.player.incrementActionCount();
+
+    if (!this.playerCanMove(command[1])) {
+      this.output('You turn and run but in your haste you forgot there is no exit in that direction.');
+      return false;
+    }
+
+    const rollForFlee = Math.floor(Math.random() * Math.floor(100));
+    const maxRoll = this.currentEnemy().fleeChance * this.player.getLuckModifier();
+    console.log('rollforflee: ', rollForFlee, '\nenemyfleechance: ', this.currentEnemy().fleeChance);
+    if (rollForFlee > maxRoll) {
+      this.output('You weren\'t quick enough to escape.  The ' + this.currentEnemy().name + ' blocked your way.');
+      return false;
+    }
+
+    return true;
   }
 
   rollForLoot(possibleLoot: Loot[]): number {
@@ -410,33 +473,32 @@ export class DungeonComponent implements OnInit {
     }
   }
 
-  move(command: string[]){
+  move(command: string[], movementMessage: string = 'You walk '){
     if (!command[1]){
       this.output('Move commands require a direction (north, south, east, or west).');
       this.output('No action taken.');
       return;
     }
 
-    const movementMessage = 'You walk ';
     const direction = command[1];
+    if (!this.playerCanMove(direction)) {
+      this.output('You cannot move in that direction.');
+      return;
+    }
 
-    if (this.contains(direction, ['up', 'north', 'forward', 'straight', 'n', 'forwards', 'f'])){
-      if (!this.playerCanMove('north')) { return; }
+    if (this.contains(direction, this.northKeywords)){
       this.player.moveNorth();
       this.output(movementMessage + 'north.');
     }
-    else if (this.contains(direction, ['down', 'south', 'backward', 'backwards', 's', 'back', 'b'])){
-      if (!this.playerCanMove('south')) { return; }
+    else if (this.contains(direction, this.southKeywords)){
       this.player.moveSouth();
       this.output(movementMessage + 'south.');
     }
-    else if (this.contains(direction, ['right', 'east', 'e', 'r'])){
-      if (!this.playerCanMove('east')) { return; }
+    else if (this.contains(direction, this.eastKeywords)){
       this.player.moveEast();
       this.output(movementMessage + 'east.');
     }
-    else if (this.contains(direction, ['left', 'west', 'w', 'l'])){
-      if (!this.playerCanMove('west')) { return; }
+    else if (this.contains(direction, this.westKeywords)){
       this.player.moveWest();
       this.output(movementMessage + 'west.');
     }
@@ -456,24 +518,20 @@ export class DungeonComponent implements OnInit {
     const currentX = this.player.x;
     const currentY = this.player.y;
 
-    switch (direction){
-      case('north'): {
-        if (this.tileAt(currentX, currentY - 1)){ canMove = true; }
-        break;
-      }
-      case('south'): {
-        if (this.tileAt(currentX, currentY + 1)){ canMove = true; }
-        break;
-      }
-      case('east'): {
-        if (this.tileAt(currentX + 1, currentY)){ canMove = true; }
-        break;
-      }
-      case('west'): {
-        if (this.tileAt(currentX - 1, currentY)){ canMove = true; }
-        break;
-      }
-      default: console.warn('Invalid direction given to playerCanMove().');
+    if (this.contains(direction, this.northKeywords)){
+      if (this.tileAt(currentX, currentY - 1)){ canMove = true; }
+    }
+    else if (this.contains(direction, this.southKeywords)){
+      if (this.tileAt(currentX, currentY + 1)){ canMove = true; }
+    }
+    else if (this.contains(direction, this.eastKeywords)){
+      if (this.tileAt(currentX + 1, currentY)){ canMove = true; }
+    }
+    else if (this.contains(direction, this.westKeywords)){
+      if (this.tileAt(currentX - 1, currentY)){ canMove = true; }
+    }
+    else{
+      console.warn('Invalid direction given to playerCanMove().');
     }
 
     if (!canMove){ this.output('That way appears to be blocked.'); }
