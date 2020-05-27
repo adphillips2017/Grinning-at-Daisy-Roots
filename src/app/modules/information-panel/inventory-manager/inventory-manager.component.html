@@ -1,0 +1,17 @@
+<div class="inventory-manager">
+    <div class="category">
+        <div class="header">Equipped</div>
+        <div class="item" *ngFor="let equipment of player.getEquippedItems(); index as e">
+            <div>{{ e + 1 + '. ' + equipment.label }}</div>
+            <div>{{ equipment.slot[0] }}</div>
+        </div>
+    </div>
+
+    <div class="category">
+        <div class="header">Items</div>
+        <div class="item" *ngFor="let item of player.getInventory(); index as i">
+            <div>{{ i + 1 + '. ' + item.label }}</div>
+            <div>x{{ item.count }}</div>
+        </div>
+    </div>
+</div>

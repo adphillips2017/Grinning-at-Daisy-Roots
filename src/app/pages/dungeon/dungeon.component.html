@@ -9,7 +9,10 @@
                 <app-terminal-input (issueCommand)="issueCommand($event)"></app-terminal-input>
             </div>
         </div>
-        <!-- <div class="temp-map placeholder"></div> -->
-        <app-mini-map [player]="player" [mapKey]="mapKey"></app-mini-map>
+
+        <div class="right-column">
+            <app-mini-map [player]="player" [mapKey]="mapKey"></app-mini-map>
+            <app-information-panel [player]="player"></app-information-panel>
+        </div>
     </div>
 </div>

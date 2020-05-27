@@ -1,7 +1,7 @@
 import { Item } from './Items';
 import { Effect } from '../models/Effect';
 
-type EquipmentSlot = 'head' | 'chest' | 'hands' | 'legs' | 'feet' | 'main-hand' | 'off-hand';
+type EquipmentSlot = 'Head' | 'Chest' | 'Gloves' | 'Legs' | 'Feet' | 'Main-Hand' | 'Off-Hand';
 
 class Equipment extends Item {
     slot: EquipmentSlot;
@@ -19,7 +19,7 @@ class PlainMensBoots extends Equipment {
     constructor() {
         const label = 'Plain Men\'s Boots';
         const description = 'Plain black boots designed for men.  Not particularly stylish but they protect one\s feet well enough.';
-        const slot = 'feet';
+        const slot = 'Feet';
         const effects = [{ stat: 'defense', modifier: 2 }];
 
         super(label, description, slot, effects);

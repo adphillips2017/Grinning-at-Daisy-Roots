@@ -59,7 +59,7 @@ export class DungeonComponent implements OnInit {
     this.output('To your confusion and horror you realize you are completely naked save for your knickers, though you spot a pair of boots next to you which you promptly pick up.');
     this.output(this.player.giveItem(new PlainMensBoots()));
 
-    //test
+    // test
     this.output(this.player.giveItem(new EmptyVial()));
 
     this.createMap();
