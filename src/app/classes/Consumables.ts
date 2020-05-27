@@ -31,25 +31,30 @@ class EmptyVial extends Consumable {
         const description = 'An empty vial often used by physicians for bloodletting. It is accompanied most conveniently with a needle and surgical tube.';
         const effects = [{ stat: 'health', modifier: 5 }, {stat: 'stamina', modifier: -5 }];
         let useText = 'You attach the needle to the surgical tube, and it to the vial.  You stick the needle into your arm.';
-        useText += ' As the vial begins to to turn crimson you feel a sense of relief fall over you, even if it did hurt initially.';
+        useText += ' As the vial begins to turn crimson you feel a sense of relief fall over you, even if it did hurt initially.';
+        useText += ' You slip the fresh vial of blood back into your inventory.';
 
         super(label, description, effects, useText);
     }
 }
 
 class BloodVial extends Consumable {
-    constructor(age: number){
-        const label = 'Blood Vial (' + age + ')';
+    age: number;
+
+    constructor(age: number = 0){
+        const label = 'Blood Vial(' + age + ')';
         let description = 'A vial of your own blood.  Deep red in color, it makes you feel safer for having it. ';
         description += 'Readministering the blood will heal some ailments.  It gets more potent over time.';
-        const healthModifier = 2 * age;
-        const strengthModifier = healthModifier >= 20 ? 5 : 0;
-        const effects = [{ stat: 'health', modifier: healthModifier }, { stat: 'strength', modifier: strengthModifier }];
+        const healthModifier = Math.min(2 * age, 20);
+        const strengthModifier = healthModifier < 20 ? 0 : 5;
+        const duration = healthModifier < 20 ? 0 : 3;
+        const effects = [{ stat: 'health', modifier: healthModifier }, { stat: 'strength', modifier: strengthModifier, duration }];
         let useText = 'You reattach the surgical tube and needle to the bottle before inserting the needle into your arm.';
         useText += ' As you raise the bottle above your head you feel the warmth of the blood entering your arm. The rush is intoxicating.';
         if (age === 1) { useText = 'You inject the blood just as you\'ve done a hundred times before, but the reassuring rush of warmth never comes.  It\'s maddening.  Perhaps in your haste you have robbed it of its potency?'; }
 
         super(label, description, effects, useText);
+        this.age = age;
     }
 }
 

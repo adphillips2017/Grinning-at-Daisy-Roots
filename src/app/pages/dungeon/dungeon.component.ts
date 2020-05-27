@@ -10,8 +10,8 @@ import { TerminalMessage } from 'src/app/models/TerminalMessage';
 import { Loot } from 'src/app/models/Loot';
 import { Item } from 'src/app/classes/Items';
 import { MiniMapComponent } from 'src/app/modules/mini-map/mini-map.component';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
-import { Equipment } from 'src/app/classes/Equipment';
+import { PlainMensBoots } from 'src/app/classes/Equipment';
+import { Consumable, EmptyVial, BloodVial } from 'src/app/classes/Consumables';
 
 @Component({
   selector: 'app-dungeon',
@@ -33,6 +33,7 @@ export class DungeonComponent implements OnInit {
   attackKeywords = ['attack', 'hit', 'strike'];
   equipKeywords = ['equip', 'e'];
   unequipKeywords = ['unequip', 'u'];
+  useKeywords = ['use'];
 
   mapKey: MapKey = [
     ['--', 'XT', '--'],
@@ -53,9 +54,13 @@ export class DungeonComponent implements OnInit {
     this.playerActions = 0;
     this.worldMap = [];
 
-    this.output('Welcome home.');
-    this.output('You open your eyes and find yourself hunched over a messy desk, the hard cheery wood cool against your face.')
+    this.output('You open your eyes and find yourself draped over a messy desk, the cherry wood cool against your perspiring face.');
     this.output('As you sit up your eyes adjust to the light and you begin to see the dimly lit interior of a room you don\'t recognize.');
+    this.output('To your confusion and horror you realize you are completely naked save for your knickers, though you spot a pair of boots next to you which you promptly pick up.');
+    this.output(this.player.giveItem(new PlainMensBoots()));
+
+    //test
+    this.output(this.player.giveItem(new EmptyVial()));
 
     this.createMap();
   }
@@ -118,6 +123,7 @@ export class DungeonComponent implements OnInit {
 
     if (this.interaction.type !== 'none') {
       this.handleInteraction(this.interaction, command);
+      return;
     }
 
     if (this.contains(keyword, this.helpKeywords)) {
@@ -135,10 +141,40 @@ export class DungeonComponent implements OnInit {
     else if (this.contains(keyword, this.unequipKeywords)) {
       this.unequipItem(command);
     }
+    else if (this.contains(keyword, this.useKeywords)) {
+      this.useItem(command);
+    }
     else {
       this.output('Command not recognized, please try again.');
       this.output('Type "help" for a list of commands.');
     }
+  }
+
+  useItem(command: string[]): void {
+    if (!command[1]) {
+      if (this.player.getConsumables().length < 1) {
+        this.output('No usable items in inventory.');
+        return;
+      }
+
+      this.output('Use action requires Item Number of the item you wish to use.  Usable items: ');
+      let index = 1;
+      this.player.getInventory().forEach(item => {
+        if (item instanceof Consumable) {
+          this.output(index + '. ' + item.label);
+        }
+        index++;
+      });
+      return;
+    }
+
+    const useChocie = parseInt(command[1], 10);
+    if (isNaN(useChocie)) { this.output('Invalid use choice given.'); }
+    if (useChocie > this.player.getInventory().length) { this.output('Item selection out of range.'); }
+
+    const useItem: any = this.player.getInventory()[useChocie - 1];
+    this.output(this.player.useItem(useItem));
+    if (useItem instanceof EmptyVial) { this.output(this.player.giveItem(new BloodVial())); }
   }
 
   equipItem(command: string[]): void {
@@ -215,10 +251,16 @@ export class DungeonComponent implements OnInit {
   }
 
   handleCombat(actions: string[], playerCommand: string[]){
+    const staminaCost = -2;
     if (this.contains(playerCommand[0], this.attackKeywords) && this.contains('attack', actions)){
+      if (!this.player.hasEnoughStamina(staminaCost)) {
+        this.output('You don\'t have enough stamina for that!');
+        return;
+      }
       const playerDamage = this.player.getDamage();
       this.currentEnemy().takeDamage(playerDamage);
-      this.playerActions++;
+      this.player.incrementActionCount();
+      this.player.modifyStamina(staminaCost);
       this.output('You hit the ' + this.currentEnemy().name + ' for ' + playerDamage + ' damage.');
 
       if (!this.currentEnemy().isAlive) {
@@ -240,10 +282,10 @@ export class DungeonComponent implements OnInit {
       this.output('You cannot do that now. You are in combat.');
     }
 
-    if (this.playerActions >= this.currentEnemy().haste && this.currentEnemy().isAlive) {
+    if (this.player.getActionCount() >= this.currentEnemy().haste && this.currentEnemy().isAlive) {
       const enemyDamage = this.currentEnemy().getDamage();
       this.player.takeDamage(enemyDamage);
-      this.playerActions = 0;
+      this.player.resetActionCount();
       this.output('The ' + this.currentEnemy().name + ' hit you for ' + enemyDamage + ' damage.');
 
       if (!this.player.isAlive) {

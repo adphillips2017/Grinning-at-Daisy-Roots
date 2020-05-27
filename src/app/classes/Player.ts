@@ -1,7 +1,7 @@
 import { Item } from './Items';
-import { Equipment, PlainMensBoots } from './Equipment';
-import { RustyDagger } from './Weapons';
-import { StaleBread } from './Consumables';
+import { Equipment } from './Equipment';
+import { BloodVial, Consumable, EmptyVial } from './Consumables';
+import { Effect } from '../models/Effect';
 
 export class Player {
     private health: number;
@@ -23,15 +23,14 @@ export class Player {
     unallocatedPoints: number;
     isAlive: boolean;
     private equipment: Equipment[];
+    private actionCount: number;
+    temporaryEffects: Effect[];
 
     constructor() {
         this.maxHealth = 100;
         this.health = 100;
         this.equipment = [];
-        this.inventory = [
-            new PlainMensBoots(),
-            new StaleBread()
-        ];
+        this.inventory = [];
         this.strength = 4;
         this.maxStamina = 25;
         this.stamina = 25;
@@ -46,6 +45,68 @@ export class Player {
         this.xp = 0;
         this.unallocatedPoints = 0;
         this.isAlive = true;
+        this.actionCount = 0;
+        this.temporaryEffects = [];
+    }
+
+    getActionCount(): number {
+        return this.actionCount;
+    }
+
+    incrementActionCount(): void {
+        this.actionCount++;
+        this.ageBloodVials();
+        this.resolveTemporaryEffects();
+    }
+
+    resetActionCount(): void {
+        this.actionCount = 0;
+    }
+
+    resolveTemporaryEffects(): void {
+        this.temporaryEffects.forEach(effect => {
+            effect.duration--;
+            if (effect.duration <= 0) {
+                this.temporaryEffects.splice(this.temporaryEffects.indexOf(effect));
+                this.removeEffect(effect);
+            }
+        });
+        // remove stat bonuses
+    }
+
+    ageBloodVials(): void {
+        this.inventory.forEach(item => {
+            if (item instanceof BloodVial) {
+                this.removeItem(item);
+                console.log('action count: ', item.age);
+                this.giveItem(new BloodVial(item.age + 1));
+            }
+        });
+    }
+
+    getConsumables(): Consumable[] {
+        const consumables: Consumable[] = [];
+
+        this.getInventory().forEach(item => {
+            if (item instanceof Consumable) { consumables.push(item); }
+        });
+
+        return consumables;
+    }
+
+    useItem(item: Consumable): string {
+        if (!(item instanceof Consumable)) { return 'This item is not usable.'; }
+
+        item.effects.forEach(effect => {
+            if (effect.duration) {
+                this.temporaryEffects.push(effect);
+            }
+
+            this.addEffect(effect);
+        });
+
+        this.removeItem(item);
+        return item.useText;
     }
 
     getEquippedItems(): Equipment[] {
@@ -75,41 +136,7 @@ export class Player {
         }
         this.removeItem(item);
         this.equipment.push(item);
-        item.effects.forEach(effect => {
-            switch (effect.stat) {
-                case('max-health'): {
-                    this.maxHealth += effect.modifier;
-                    break;
-                }
-                case('strength'): {
-                    this.strength += effect.modifier;
-                    break;
-                }
-                case('max-stamina'): {
-                    this.maxStamina += effect.modifier;
-                    break;
-                }
-                case('intelligence'): {
-                    this.intelligence += effect.modifier;
-                    break;
-                }
-                case('perception'): {
-                    this.perception += effect.modifier;
-                    break;
-                }
-                case('defense'): {
-                    this.defense += effect.modifier;
-                    break;
-                }
-                case('luck'): {
-                    this.luck += effect.modifier;
-                    break;
-                }
-                default: {
-                    console.warn('Item with unknown equipment stat: ', item);
-                }
-            }
-        });
+        item.effects.forEach(effect => { this.addEffect(effect); });
 
         return responseMessage += 'Equipped ' + item.label;
     }
@@ -118,43 +145,97 @@ export class Player {
         if (this.equipment.indexOf(item) < 0) { return item.label + ' is not currently equipped.'; }
         this.inventory.unshift(item);
         this.equipment.splice(this.equipment.indexOf(item), 1);
-        item.effects.forEach(effect => {
-            switch (effect.stat) {
-                case('max-health'): {
-                    this.maxHealth -= effect.modifier;
-                    break;
-                }
-                case('strength'): {
-                    this.strength -= effect.modifier;
-                    break;
-                }
-                case('max-stamina'): {
-                    this.maxStamina -= effect.modifier;
-                    break;
-                }
-                case('intelligence'): {
-                    this.intelligence -= effect.modifier;
-                    break;
-                }
-                case('perception'): {
-                    this.perception -= effect.modifier;
-                    break;
-                }
-                case('defense'): {
-                    this.defense -= effect.modifier;
-                    break;
-                }
-                case('luck'): {
-                    this.luck -= effect.modifier;
-                    break;
-                }
-                default: {
-                    console.warn('Item with unknown equipment stat: ', item);
-                }
-            }
-        });
+        item.effects.forEach(effect => { this.removeEffect(effect); });
 
         return 'Unequipped ' + item.label + '.';
+    }
+
+    addEffect(effect: Effect): void {
+        switch (effect.stat) {
+            case('health'): {
+                this.modifyHealth(effect.modifier);
+                break;
+            }
+            case('max-health'): {
+                this.maxHealth += effect.modifier;
+                break;
+            }
+            case('strength'): {
+                this.strength += effect.modifier;
+                break;
+            }
+            case('stamina'): {
+                this.modifyStamina(effect.modifier);
+                break;
+            }
+            case('max-stamina'): {
+                this.maxStamina += effect.modifier;
+                break;
+            }
+            case('intelligence'): {
+                this.intelligence += effect.modifier;
+                break;
+            }
+            case('perception'): {
+                this.perception += effect.modifier;
+                break;
+            }
+            case('defense'): {
+                this.defense += effect.modifier;
+                break;
+            }
+            case('luck'): {
+                this.luck += effect.modifier;
+                break;
+            }
+            default: {
+                console.warn('Effect with unknown equipment stat: ', effect);
+            }
+        }
+    }
+
+    removeEffect(effect: Effect): void {
+        switch (effect.stat) {
+            case('health'): {
+                this.modifyHealth(-1 * effect.modifier);
+                break;
+            }
+            case('max-health'): {
+                this.maxHealth -= effect.modifier;
+                break;
+            }
+            case('strength'): {
+                this.strength -= effect.modifier;
+                break;
+            }
+            case('stamina'): {
+                this.modifyStamina(-1 * effect.modifier);
+                break;
+            }
+            case('max-stamina'): {
+                this.maxStamina -= effect.modifier;
+                break;
+            }
+            case('intelligence'): {
+                this.intelligence -= effect.modifier;
+                break;
+            }
+            case('perception'): {
+                this.perception -= effect.modifier;
+                break;
+            }
+            case('defense'): {
+                this.defense -= effect.modifier;
+                break;
+            }
+            case('luck'): {
+                this.luck -= effect.modifier;
+                break;
+            }
+            default: {
+                console.warn('Effect with unknown equipment stat: ', effect);
+            }
+        }
     }
 
     getHealth(): number {
@@ -162,11 +243,27 @@ export class Player {
     }
 
     modifyHealth(modifier: number): void {
+        console.log('modifier: ', modifier);
         this.health = this.health + modifier;
         if (this.health < 0) {
             this.health = 0;
             this.isAlive = false;
+        } else if (this.health > this.maxHealth) {
+            this.health = this.maxHealth;
         }
+
+        this.health = Math.round((this.health + Number.EPSILON) * 100) / 100;
+    }
+
+    modifyStamina(modifier: number): void {
+        this.stamina = this.stamina + modifier;
+        if (this.stamina > this.maxStamina) {
+            this.stamina = this.maxStamina;
+        }
+    }
+
+    hasEnoughStamina(staminaRequired: number): boolean {
+        return this.stamina + staminaRequired >= 0;
     }
 
     getDamage(): number {
@@ -218,7 +315,7 @@ export class Player {
         this.unallocatedPoints += 1;
     }
 
-    giveItem(item: Item): void {
+    giveItem(item: Item): string {
         let itemIndex = -1;
         this.inventory.forEach((tempItem, index) => {
             if (tempItem.label === item.label) { itemIndex = index; }
@@ -234,6 +331,8 @@ export class Player {
         }else {
             this.inventory.push(item);
         }
+
+        return item.count + ' ' + item.label + ' added to your inventory.';
     }
 
     removeItem(item: Item): void {
@@ -249,8 +348,7 @@ export class Player {
             { label: 'Strength', value: this.strength },
             { label: 'Intelligence', value: this.intelligence },
             { label: 'Perception', value: this.perception },
-            { label: 'Luck', value: this.luck },
-            { label: 'Inventory', value: this.getInventoryCount() }
+            { label: 'Luck', value: this.luck }
         ];
     }
 
