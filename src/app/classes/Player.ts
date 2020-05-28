@@ -334,7 +334,7 @@ export class Player {
 
         if (itemIndex > -1){
             this.inventory[itemIndex].count += item.count;
-            return;
+            return item.count + ' ' + item.label + ' added to your inventory.';
         }
 
         if (item instanceof Equipment) {

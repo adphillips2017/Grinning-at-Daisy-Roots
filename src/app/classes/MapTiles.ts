@@ -56,7 +56,7 @@ class MapTile {
 
 class StartTile extends MapTile {
     constructor(x: number, y: number){
-        let description = 'The room appears lived in.  By whom, you\re not certain.  There are papers and books strewn about on the desk and surrounding floor.';
+        let description = 'The room appears lived in.  By whom, you\'re not certain.  There are papers and books strewn about on the desk and surrounding floor.';
         description += ' Nothing looks familiar.';
         const states = {
             1: {
