@@ -10,7 +10,6 @@ import { TerminalMessage } from 'src/app/models/TerminalMessage';
 import { Loot } from 'src/app/models/Loot';
 import { Item } from 'src/app/classes/Items';
 import { MiniMapComponent } from 'src/app/modules/mini-map/mini-map.component';
-import { PlainMensBoots } from 'src/app/classes/Equipment';
 import { Consumable, EmptyVial, BloodVial } from 'src/app/classes/Consumables';
 
 @Component({
@@ -22,7 +21,7 @@ export class DungeonComponent implements OnInit {
   @ViewChild(MiniMapComponent) miniMap: MiniMapComponent;
   player: Player;
   messages: TerminalMessage[];
-  interaction: PlayerInteraction;
+  manualInteraction: PlayerInteraction;
   currentLevel: number;
   playerActions: number;
   worldMap: Map;
@@ -40,6 +39,9 @@ export class DungeonComponent implements OnInit {
   southKeywords = ['down', 'south', 'backward', 'backwards', 's', 'back', 'b'];
   eastKeywords = ['right', 'east', 'e', 'r'];
   westKeywords = ['left', 'west', 'w', 'l'];
+  takeKeywords = ['take', 't', 'loot', 'grab', 'pick-up'];
+
+  noInteraction: PlayerInteraction = { type: 'none', actions: [] };
 
   mapKey: MapKey = [
     ['--', 'ER', '--', 'E1', 'ER'],
@@ -49,11 +51,12 @@ export class DungeonComponent implements OnInit {
     ['--', 'ER', '--', 'ER', 'E1']
   ];
 
-  staminaCost: {
+  staminaCost = {
     combat: -2,
     flee: -5,
     search: -3
   };
+
 
   ngOnInit() {
     this.play();
@@ -62,18 +65,14 @@ export class DungeonComponent implements OnInit {
   play(): void {
     this.player = new Player();
     this.messages = [];
-    this.interaction = { type: 'none', actions: []};
     this.currentLevel = 1;
     this.playerActions = 0;
     this.worldMap = [];
+    this.manualInteraction = this.noInteraction;
 
     this.output('You open your eyes and find yourself draped over a messy desk, the cherry wood cool against your perspiring face.');
     this.output('As you sit up your eyes adjust to the light and you begin to see the dimly lit interior of a room you don\'t recognize.');
-    this.output('To your confusion and horror you realize you are completely naked save for your knickers, though you spot a pair of boots next to you which you promptly pick up.');
-    this.output(this.player.giveItem(new PlainMensBoots()));
-
-    this.output('You also notice a small empty vial lying next to a tubing apparatus which you think might be useful as well.');
-    this.output(this.player.giveItem(new EmptyVial()));
+    this.output('To your confusion and horror you realize you are completely naked save for your knickers, though you spot a pair of boots lying next to you.');
 
     this.createMap();
   }
@@ -102,7 +101,7 @@ export class DungeonComponent implements OnInit {
             break;
           }
           case('ER'): {
-            mapRow.push(new EmptyRoomTile(x, y));
+            mapRow.push(new EmptyRoomTile(x, y, []));
             break;
           }
           case('XT'): {
@@ -134,8 +133,8 @@ export class DungeonComponent implements OnInit {
     const command = playerInput.split(' ');
     const keyword = command[0];
 
-    if (this.interaction.type !== 'none') {
-      this.handleInteraction(this.interaction, command);
+    if (this.currentInteraction().type !== 'none') {
+      this.handleInteraction(this.currentInteraction(), command);
       return;
     }
 
@@ -163,6 +162,9 @@ export class DungeonComponent implements OnInit {
     else if (this.contains(keyword, this.fleeKeywords)) {
       if (this.attemptToFlee(command)) { this.flee(command); }
     }
+    else if (this.contains(keyword, this.takeKeywords)) {
+      this.takeItem(command);
+    }
     else {
       this.output('Command not recognized, please try again.');
       this.output('Type "help" for a list of commands.');
@@ -177,8 +179,11 @@ export class DungeonComponent implements OnInit {
     }
 
     if (command[1] === 'enemy') {
-      if (this.currentTile().enemy){
+      if (this.currentTile().enemy && this.currentEnemy().isAlive){
         this.output(this.currentEnemy().description);
+        return;
+      } else if (this.currentTile().enemy && !this.currentEnemy().isAlive){
+        this.output('It\'s dead.  The smell is so severe you begin to gag when trying to get near it..');
         return;
       }
       else {
@@ -188,7 +193,10 @@ export class DungeonComponent implements OnInit {
       }
     }
     else if (command[1] === 'room') {
-      this.output(this.currentTile().description);
+      this.output(this.currentTile().states[this.currentTile().currentState].description);
+      if (this.currentTile().availableLoot.length > 0){
+        this.output('You see ' + this.getAvailableLootString());
+      }
       return;
     }
 
@@ -215,6 +223,20 @@ export class DungeonComponent implements OnInit {
     else {
       this.output(this.player.getInventory()[inspectChoice - 1].description);
       this.player.incrementActionCount();
+    }
+  }
+
+  getAvailableLootString(): string {
+    if (this.currentTile().availableLoot.length === 1){
+      return '[1. ' + this.currentTile().availableLoot[0].label + '] lying on the ground.';
+    } else if (this.currentTile().availableLoot.length > 1) {
+      let lootExposition = '';
+      this.currentTile().availableLoot.forEach((item, index) => {
+        if (index === this.currentTile().availableLoot.length - 1) { lootExposition += 'and '; }
+        lootExposition += '[' + index + '. ' + item.label + '] ';
+      });
+      lootExposition += ' lying around.';
+      return lootExposition;
     }
   }
 
@@ -249,7 +271,27 @@ export class DungeonComponent implements OnInit {
     const useItem: any = this.player.getInventory()[useChoice - 1];
     this.output(this.player.useItem(useItem));
     if (useItem instanceof EmptyVial) { this.output(this.player.giveItem(new BloodVial())); }
-    if (this.interaction.type === 'combat') { this.player.incrementActionCount(); }
+    if (this.currentInteraction().type === 'combat') { this.player.incrementActionCount(); }
+  }
+
+  takeItem(command: string[]): void {
+    if (!command) {
+      if (this.currentTile().availableLoot.length > 1) {
+        this.output('You didn\'t pass in an item number to take, but you do see ' + this.getAvailableLootString());
+      } else {
+        this.output('There\'s nothing lying around worth taking.');
+        return;
+      }
+    }
+
+    const takeChoice = parseInt(command[1], 10);
+    if (isNaN(takeChoice)) { this.output('Invalid take choice given.'); }
+    else if (takeChoice > this.currentTile().availableLoot.length) { this.output('Take selection out of range.'); }
+    else {
+      const takeItem: any = this.currentTile().availableLoot[takeChoice - 1];
+      this.output(this.player.giveItem(takeItem));
+      this.currentTile().availableLoot.splice(this.currentTile().availableLoot.indexOf(takeItem), 1);
+    }
   }
 
   equipItem(command: string[]): void {
@@ -274,7 +316,7 @@ export class DungeonComponent implements OnInit {
       const equipItem: any = this.player.getInventory()[equipChoice - 1];
       this.output(this.player.equipItem(equipItem));
     }
-    if (this.interaction.type === 'combat') { this.player.incrementActionCount(); }
+    if (this.currentInteraction().type === 'combat') { this.player.incrementActionCount(); }
   }
 
   unequipItem(command: string[]): void {
@@ -300,7 +342,7 @@ export class DungeonComponent implements OnInit {
       const equipItem: any = this.player.getEquippedItems()[unequipChoice - 1];
       this.output(this.player.unequipItem(equipItem));
     }
-    if (this.interaction.type === 'combat') { this.player.incrementActionCount(); }
+    if (this.currentInteraction().type === 'combat') { this.player.incrementActionCount(); }
   }
 
   handleInteraction(interaction: PlayerInteraction, playerCommand: string[]): void {
@@ -326,7 +368,7 @@ export class DungeonComponent implements OnInit {
   gameOver() {
     this.output('Game Over.');
     this.output('Try again? (y/n)');
-    this.interaction = { type: 'GameOver', actions: ['restart']};
+    this.manualInteraction = { type: 'GameOver', actions: ['restart']};
   }
 
   handleCombat(actions: string[], playerCommand: string[]){
@@ -343,14 +385,12 @@ export class DungeonComponent implements OnInit {
 
       if (!this.currentEnemy().isAlive) {
         this.output('You slayed the ' + this.currentEnemy().name + '.');
-        this.output(this.currentEnemy().deadText);
         const lootRoll = this.rollForLoot(this.currentEnemy().loot);
-        this.currentTile().imageState = 2;
-        this.interaction = { type: 'none', actions: []};
+        this.currentTile().currentState = 2;
 
         if (lootRoll) {
           const lootItem = this.getLoot(this.currentEnemy().loot, lootRoll);
-          this.player.giveItem(lootItem);
+          this.currentTile().availableLoot.push(lootItem);
           this.output('The ' + this.currentEnemy().name + ' dropped ' + lootItem.label + '.');
         }
       } else {
@@ -404,12 +444,11 @@ export class DungeonComponent implements OnInit {
 
   flee(command: string[]): void {
     this.player.resetActionCount();
-    this.interaction = { type: 'none', actions: [] };
     this.move(command, 'You manage to escape and run ');
   }
 
   attemptToFlee(command: string[]): boolean {
-    if (this.interaction.type !== 'combat') {
+    if (this.currentInteraction().type !== 'combat') {
       this.output('You have nothing to flee from. (That you can see.)');
       return false;
     }
@@ -527,7 +566,7 @@ export class DungeonComponent implements OnInit {
 
     this.miniMap.generateMiniMap();
     this.playIntro();
-    if (this.currentTile().type === 'ExitTile') { this.gameOver(); }
+    if (this.currentTile() instanceof ExitTile) { this.gameOver(); }
   }
 
   playerCanMove(direction: string): boolean {
@@ -568,17 +607,11 @@ export class DungeonComponent implements OnInit {
 
   playIntro(): void {
     const currentTile = this.currentTile();
-    this.output(currentTile.intro);
-    this.interaction = currentTile.interaction;
-
-    if (this.currentEnemy()) {
-      if (this.currentEnemy().isAlive){ this.output(this.currentEnemy().aliveText); }
-      else { this.output(this.currentEnemy().deadText); }
-    }
+    this.output(currentTile.states[currentTile.currentState].intro);
   }
 
   getCurrentImage(): string {
-    const image = '../../../assets/images/backgrounds/' + this.currentTile().images[this.currentTile().imageState];
+    const image = '../../../assets/images/backgrounds/' + this.currentTile().states[this.currentTile().currentState].image;
     return image;
   }
 
@@ -590,6 +623,11 @@ export class DungeonComponent implements OnInit {
     const x = this.player.x;
     const y = this.player.y;
     return this.tileAt(x, y);
+  }
+
+  currentInteraction(): PlayerInteraction {
+    if (this.manualInteraction.type !== 'none') { return this.manualInteraction; }
+    return this.currentTile().states[this.currentTile().currentState].interaction;
   }
 
   tileAt(x: number, y: number): MapTile | undefined{

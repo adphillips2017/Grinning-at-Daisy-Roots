@@ -1,7 +1,10 @@
 import { Loot } from '../models/Loot';
-import { StaleBread } from './Consumables';
+import { StaleBread, EmptyVial } from './Consumables';
 import { PlayerInteraction } from '../models/PlayerInteraction';
 import { Teeth } from './Items';
+import { TileStates } from './MapTiles';
+
+const noInteraction: PlayerInteraction = { type: 'none', actions: [] };
 
 class Enemy {
     private health: number;
@@ -12,14 +15,11 @@ class Enemy {
     tier: number;
     isAlive: boolean;
     loot: Loot[];
-    aliveText: string;
-    deadText: string;
-    imageAlive: string;
-    imageDead: string;
     description: string;
     interaction: PlayerInteraction;
     name: string;
     fleeChance: number;
+    tileStates: TileStates;
 
     constructor(
         health: number,
@@ -29,13 +29,10 @@ class Enemy {
         xp: number,
         tier: number,
         loot: Loot[],
-        aliveText: string,
-        deadText: string,
-        imageAlive: string,
-        imageDead: string,
         description: string,
         name: string,
-        fleeChance: number
+        fleeChance: number,
+        tileStates: TileStates
     ) {
         this.health = health;
         this.strength = strength;
@@ -45,14 +42,10 @@ class Enemy {
         this.tier = tier;
         this.isAlive = true;
         this.loot = loot;
-        this.aliveText = aliveText;
-        this.deadText = deadText;
-        this.imageAlive = imageAlive;
-        this.imageDead = imageDead;
         this.description = description;
-        this.interaction = { type: 'combat', actions: ['attack', 'flee', 'inspect']};
         this.name = name;
         this.fleeChance = fleeChance;
+        this.tileStates = tileStates;
     }
 
     takeDamage(damage: number): void {
@@ -61,6 +54,8 @@ class Enemy {
             this.health = 0;
             this.isAlive = false;
         }
+
+        this.health = Math.round((this.health + Number.EPSILON) * 100) / 100;
     }
 
     getHealth(): number {
@@ -81,18 +76,30 @@ class Arachnid extends Enemy {
         const xp = 5;
         const tier = 1;
         const loot = [
+            { chance: 5, item: new EmptyVial() },
             { chance: 15, item: new Teeth() },
             { chance: 60, item: new StaleBread() }
         ];
         const aliveText = 'A large arachnid looking creature appears to defend its nest.';
-        const deadText = 'The dead carcass of an arachnid lies in the center of the room.';
-        const imageDead = 'arachnid-dead.png';
-        const imageAlive = 'arachnid-alive.png';
         const description = 'The arachnid is surprisingly quick for its size.';
         const name = 'Arachnid';
         const fleeChance = 50;
+        const tileStates: TileStates = {
+            1: {
+                image: 'arachnid-alive.png',
+                intro: 'You step into a room that appears to be the nesting grounds of some creature. ' + aliveText,
+                description: 'The room is surprisingly intact considering the size and temperament of the creature before you.',
+                interaction: { type: 'combat', actions: ['attack', 'flee', 'inspect']}
+            },
+            2: {
+                image: 'arachnid-dead.png',
+                intro: 'You step into the remnants of a battle you\ve already won.  The creature\'s lifeless carcass lies in the center of the room. You walk around it to the center of the room.',
+                description: 'The room is in disarray in the wake of the battle that took place here.  The carcass is beginning to turn, the smell stings your nostrils.',
+                interaction: noInteraction
+            }
+        };
 
-        super(health, strength, defense, haste, xp, tier, loot, aliveText, deadText, imageAlive, imageDead, description, name, fleeChance);
+        super(health, strength, defense, haste, xp, tier, loot, description, name, fleeChance, tileStates);
     }
 }
 

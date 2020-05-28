@@ -7,10 +7,13 @@ export class Player {
     private health: number;
     private inventory: Item[];
     private xpLevels: number[];
+    private equipment: Equipment[];
+    private actionCount: number;
     x: number;
     y: number;
     maxHealth: number;
     maxStamina: number;
+    attack: number;
     strength: number;
     stamina: number;
     intelligence: number;
@@ -22,13 +25,12 @@ export class Player {
     xp: number;
     unallocatedPoints: number;
     isAlive: boolean;
-    private equipment: Equipment[];
-    private actionCount: number;
     temporaryEffects: Effect[];
 
     constructor() {
         this.maxHealth = 100;
         this.health = 100;
+        this.attack = 1;
         this.equipment = [];
         this.inventory = [];
         this.strength = 4;
@@ -270,16 +272,22 @@ export class Player {
     }
 
     getDamage(): number {
-        return this.strength;
+        const rawDamage = this.attack;
+        const strengthModifier = this.strength * .75;
+        let staminaPenalty = 1 - (0.05 * (this.maxStamina - this.stamina));
+        if (staminaPenalty < 0.8){ staminaPenalty = 0.8; }
+        const damage = rawDamage + strengthModifier * staminaPenalty;
+
+        return  Math.round((damage + Number.EPSILON) * 100) / 100;
     }
 
     takeDamage(damage: number): void {
-        const damageModifier = this.calculateDamageModifier();
-        const damageAmount = damageModifier * damage * -1;
+        const defenseModifier = this.calculateDefenseModifier();
+        const damageAmount = defenseModifier * damage * -1;
         this.modifyHealth(damageAmount);
     }
 
-    calculateDamageModifier(): number {
+    calculateDefenseModifier(): number {
         const damageModifier = this.defense;
         const damage = 1 - (damageModifier * .01);
         return damage;

@@ -19,6 +19,7 @@ export class CommandsHelperComponent {
   southKeywords = ['down', 'south', 'backward', 'backwards', 's', 'back', 'b'];
   eastKeywords = ['right', 'east', 'e', 'r'];
   westKeywords = ['left', 'west', 'w', 'l'];
+  takeKeywords = ['take', 't', 'loot', 'grab', 'pick-up'];
 
   commands = [
     {
@@ -30,6 +31,11 @@ export class CommandsHelperComponent {
       label: 'inventory',
       aliases: this.inventoryKeywords,
       helpText: 'Use this keyword to check your inventory.'
+    },
+    {
+      label: 'take',
+      aliases: this.takeKeywords,
+      helpText: 'Use this keyword with the Item Number of an Item lying around in your current room to add it to your inventory.'
     },
     {
       label: 'attack',
