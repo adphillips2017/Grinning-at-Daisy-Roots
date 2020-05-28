@@ -42,11 +42,18 @@ export class DungeonComponent implements OnInit {
   westKeywords = ['left', 'west', 'w', 'l'];
 
   mapKey: MapKey = [
-    ['--', 'XT', '--'],
-    ['--', 'E1', '--'],
-    ['ER', 'ST', 'E1'],
-    ['--', 'ER', '--']
+    ['--', 'ER', '--', 'E1', 'ER'],
+    ['--', 'E1', 'ER', 'ER', 'E1'],
+    ['ER', 'ER', 'E1', '--', 'ER'],
+    ['--', 'ST', '--', 'XT', 'E1'],
+    ['--', 'ER', '--', 'ER', 'E1']
   ];
+
+  staminaCost: {
+    combat: -2,
+    flee: -5,
+    search: -3
+  };
 
   ngOnInit() {
     this.play();
@@ -65,7 +72,7 @@ export class DungeonComponent implements OnInit {
     this.output('To your confusion and horror you realize you are completely naked save for your knickers, though you spot a pair of boots next to you which you promptly pick up.');
     this.output(this.player.giveItem(new PlainMensBoots()));
 
-    // test
+    this.output('You also notice a small empty vial lying next to a tubing apparatus which you think might be useful as well.');
     this.output(this.player.giveItem(new EmptyVial()));
 
     this.createMap();
@@ -192,7 +199,10 @@ export class DungeonComponent implements OnInit {
         inspectChoice = parseInt(command[2], 10);
         if (isNaN(inspectChoice)) {this.output('Invalid inspect choice given.'); }
         else if (inspectChoice > this.player.getEquippedItems().length) { this.output('Equipment selection out of range.'); }
-        else { this.output(this.player.getEquippedItems()[inspectChoice - 1].description); }
+        else {
+          this.output(this.player.getEquippedItems()[inspectChoice - 1].description);
+          this.player.incrementActionCount();
+        }
       } else {
         this.output('Unknown inspect command given.');
       }
@@ -202,7 +212,10 @@ export class DungeonComponent implements OnInit {
     inspectChoice = parseInt(command[1], 10);
     if (isNaN(inspectChoice)) {this.output('Invalid inspect choice given.'); }
     else if (inspectChoice > this.player.getInventory().length) { this.output('Item selection out of range.'); }
-    else { this.output(this.player.getInventory()[inspectChoice - 1].description); }
+    else {
+      this.output(this.player.getInventory()[inspectChoice - 1].description);
+      this.player.incrementActionCount();
+    }
   }
 
   useItem(command: string[]): void {
@@ -223,17 +236,17 @@ export class DungeonComponent implements OnInit {
       return;
     }
 
-    const useChocie = parseInt(command[1], 10);
-    if (isNaN(useChocie)) {
+    const useChoice = parseInt(command[1], 10);
+    if (isNaN(useChoice)) {
       this.output('Invalid use choice given.');
       return;
     }
-    else if (useChocie > this.player.getInventory().length) {
+    else if (useChoice > this.player.getInventory().length) {
       this.output('Item selection out of range.');
       return;
     }
 
-    const useItem: any = this.player.getInventory()[useChocie - 1];
+    const useItem: any = this.player.getInventory()[useChoice - 1];
     this.output(this.player.useItem(useItem));
     if (useItem instanceof EmptyVial) { this.output(this.player.giveItem(new BloodVial())); }
     if (this.interaction.type === 'combat') { this.player.incrementActionCount(); }
@@ -317,16 +330,15 @@ export class DungeonComponent implements OnInit {
   }
 
   handleCombat(actions: string[], playerCommand: string[]){
-    const staminaCost = -2;
     if (this.contains(playerCommand[0], this.attackKeywords) && this.contains('attack', actions)){
-      if (!this.player.hasEnoughStamina(staminaCost)) {
+      if (!this.player.hasEnoughStamina(this.staminaCost.combat)) {
         this.output('You don\'t have enough stamina for that!');
         return;
       }
       const playerDamage = this.player.getDamage();
       this.currentEnemy().takeDamage(playerDamage);
       this.player.incrementActionCount();
-      this.player.modifyStamina(staminaCost);
+      this.player.modifyStamina(this.staminaCost.combat);
       this.output('You hit the ' + this.currentEnemy().name + ' for ' + playerDamage + ' damage.');
 
       if (!this.currentEnemy().isAlive) {
@@ -346,7 +358,12 @@ export class DungeonComponent implements OnInit {
       }
     }
     else if (this.contains(playerCommand[0], this.fleeKeywords) && this.contains('flee', actions)) {
+      if (!this.player.hasEnoughStamina(this.staminaCost.flee)) {
+        this.output('You don\'t have enough stamina for that!');
+        return;
+      }
       if (this.attemptToFlee(playerCommand)) {
+        this.player.modifyStamina(this.staminaCost.flee);
         this.flee(playerCommand);
         return;
       }
