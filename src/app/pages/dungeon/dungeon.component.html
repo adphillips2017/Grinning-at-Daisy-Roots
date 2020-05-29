@@ -3,6 +3,7 @@
     <div class="hud-container">
         <app-hero-panel [stats]="player.getStats()"></app-hero-panel>
         <div class="middle-column">
+            <app-modal></app-modal>
             <img class="main-image" [src]="getCurrentImage()" alt="main.jpg">
             <div class="terminal">
                 <app-terminal-display [messages]="messages"></app-terminal-display>

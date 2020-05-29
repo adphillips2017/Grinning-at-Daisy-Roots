@@ -6,6 +6,7 @@ import { InformationPanelModule } from '../../modules/information-panel/informat
 import { HeroPanelModule } from '../../modules/hero-panel/hero-panel.module';
 import { TerminalModule } from '../../modules/terminal/terminal.module';
 import { MiniMapModule } from '../../modules/mini-map/mini-map.module';
+import { ModalModule } from '../../components/modal/modal.module';
 
 
 @NgModule({
@@ -15,7 +16,8 @@ import { MiniMapModule } from '../../modules/mini-map/mini-map.module';
     HeroPanelModule,
     TerminalModule,
     MiniMapModule,
-    InformationPanelModule
+    InformationPanelModule,
+    ModalModule
   ],
   exports: [DungeonComponent]
 })
