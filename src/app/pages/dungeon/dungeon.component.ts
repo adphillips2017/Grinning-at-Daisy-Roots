@@ -26,6 +26,8 @@ export class DungeonComponent implements OnInit {
   playerActions: number;
   worldMap: Map;
 
+  playState: 'character-creation' | 'game-canvas' | 'map';
+
   helpKeywords = ['help'];
   moveKeywords = ['go', 'walk', 'travel', 'move', 'w', 'step', 'run', 'm'];
   inventoryKeywords = ['i', 'inventory'];
@@ -63,6 +65,7 @@ export class DungeonComponent implements OnInit {
   }
 
   play(): void {
+    this.playState = 'character-creation';
     this.player = new Player();
     this.messages = [];
     this.currentLevel = 1;

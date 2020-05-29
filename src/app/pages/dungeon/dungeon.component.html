@@ -1,9 +1,8 @@
 
-<div class="game-canvas">
+<div class="game-canvas" *ngIf="playState === 'game-canvas'">
     <div class="hud-container">
         <app-hero-panel [stats]="player.getStats()"></app-hero-panel>
         <div class="middle-column">
-            <app-modal></app-modal>
             <img class="main-image" [src]="getCurrentImage()" alt="main.jpg">
             <div class="terminal">
                 <app-terminal-display [messages]="messages"></app-terminal-display>
@@ -16,4 +15,8 @@
             <app-information-panel [player]="player"></app-information-panel>
         </div>
     </div>
+</div>
+
+<div class="character-creator" *ngIf="playState === 'character-creation'">
+    <app-character-creator [player]="player"></app-character-creator>
 </div>
