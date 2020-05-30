@@ -10,7 +10,7 @@
         </div>
 
         <div class="right-column">
-            <app-mini-map [player]="player" [mapKey]="mapKey" (click)="playState = 'big-map'"></app-mini-map>
+            <app-mini-map [player]="player" [mapKey]="currentMap" (click)="playState = 'big-map'"></app-mini-map>
             <app-information-panel [player]="player"></app-information-panel>
         </div>
     </div>

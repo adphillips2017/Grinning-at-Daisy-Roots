@@ -1,4 +1,4 @@
-import { Enemy, getRandomTier1Enemy, getRandomInt } from './Enemy';
+import { Enemy, getRandomTier1Enemy, getRandomInt, getRandomTier2Enemy } from './Enemy';
 import { PlayerInteraction } from '../models/PlayerInteraction';
 import { Item, OrnateKey, Teeth } from './Items';
 import { PlainMensBoots } from './Equipment';
@@ -30,7 +30,7 @@ interface Solution {
 }
 interface BlockedPath {
     solutions: Solution[];
-    direction: [number, number];
+    direction: string;
     mapTileKey: TileKey;
 }
 
@@ -115,7 +115,7 @@ class LootTile extends MapTile {
 class LockedDoorTile extends MapTile {
     blockedPaths: BlockedPath[];
 
-    constructor(x: number, y: number){
+    constructor(x: number, y: number, direction: string){
         let intro = 'You enter the room which, although looks similar at first to many others you\'ve seen before, is distincly different.';
         intro += ' One of the doors in this room has not been left agape like all the ones before, no, this door is shut.  Upon closer inspection, ';
         intro += 'the door is not only shut but also locked.  How peculiar.  The lock is fashioned from metal;  the design intricate and beautiful.';
@@ -148,7 +148,7 @@ class LockedDoorTile extends MapTile {
         this.blockedPaths = [
             {
                 solutions,
-                direction: [0, 1],
+                direction,
                 mapTileKey: 'ER'
             }
         ];
@@ -173,6 +173,15 @@ class EmptyRoomTile extends MapTile {
 class EnemyTier1 extends MapTile {
     constructor(x: number, y: number){
         const enemy: Enemy = getRandomTier1Enemy();
+        const states: TileStates = enemy.tileStates;
+
+        super(x, y, states, [], [], enemy);
+    }
+}
+
+class EnemyTier2 extends MapTile {
+    constructor(x: number, y: number){
+        const enemy: Enemy = getRandomTier2Enemy();
         const states: TileStates = enemy.tileStates;
 
         super(x, y, states, [], [], enemy);
@@ -228,6 +237,7 @@ export {
     StartTile,
     EmptyRoomTile,
     EnemyTier1,
+    EnemyTier2,
     ExitTile,
     LootTile,
     LockedDoorTile

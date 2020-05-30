@@ -1,17 +1,17 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { Player } from 'src/app/classes/Player';
-import { MapTile, ExitTile, EmptyRoomTile, StartTile, EnemyTier1, LootTile, LockedDoorTile, BlockedPath } from '../../classes/MapTiles';
+import { MapTile, ExitTile, EmptyRoomTile, StartTile, EnemyTier1, LootTile, LockedDoorTile, BlockedPath, EnemyTier2 } from '../../classes/MapTiles';
 import { Map } from '../../models/Map';
 import { MapKey, TileKey } from 'src/app/models/MapKey';
 import { PlayerInteraction } from 'src/app/models/PlayerInteraction';
 import { Enemy, getRandomInt } from 'src/app/classes/Enemy';
 import { TerminalMessage } from 'src/app/models/TerminalMessage';
 import { Loot } from 'src/app/models/Loot';
-import { Item } from 'src/app/classes/Items';
+import { Item, OrnateKey } from 'src/app/classes/Items';
 import { MiniMapComponent } from 'src/app/modules/mini-map/mini-map.component';
 import { Consumable, EmptyVial, BloodVial } from 'src/app/classes/Consumables';
-import { Equipment } from 'src/app/classes/Equipment';
+import { Equipment, WoodCane } from 'src/app/classes/Equipment';
 
 @Component({
   selector: 'app-dungeon',
@@ -49,14 +49,26 @@ export class DungeonComponent implements OnInit {
 
   noInteraction: PlayerInteraction = { type: 'none', actions: [] };
 
-  mapKey: MapKey = [
-    ['--', 'ER', '--', 'E1', 'ER'],
+  mapKey1: MapKey = [
     ['--', 'E1', 'ER', 'ER', 'E1'],
     ['ER', 'ER', 'E1', '--', 'ER'],
     ['--', 'ST', '--', 'XT', 'E1'],
     ['--', 'DT', '--', 'ER', 'E1'],
     ['--', '--', '--', '--', '--']
   ];
+
+  mapKey2: MapKey = [
+    ['--', '--', '--', '--', '--', '--', 'ER', '--', '--', '--', '--', '--', '--', '--', '--'],
+    ['--', '--', '--', 'E1', 'ER', '--', 'LE', 'ER', 'ER', 'E1', '--', '--', '--', '--', '--'],
+    ['LK', 'E2', 'LC', 'E1', 'ER', 'ER', 'E1', '--', '--', 'ER', 'LE', '--', '--', 'ER', 'E1'],
+    ['--', '--', '--', 'ER', '--', '--', 'ER', 'E1', '--', 'ER', 'E2', 'DE', '--', 'E2', 'LE'],
+    ['--', '--', '--', 'ER', 'E1', 'LE', 'E1', 'ER', 'ER', 'E1', 'ER', '--', '--', 'E1', '--'],
+    ['--', '--', '--', '--', '--', 'ER', '--', '--', '--', 'ER', '--', '--', '--', 'ER', 'ER'],
+    ['--', '--', '--', '--', '--', 'ST', '--', '--', '--', 'LE', '--', '--', '--', 'E2', '--'],
+    ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', 'XT', '--']
+  ];
+
+  currentMap: MapKey;
 
   staminaCost = {
     combat: -2,
@@ -74,6 +86,7 @@ export class DungeonComponent implements OnInit {
     this.currentLevel = 1;
     this.playerActions = 0;
     this.worldMap = [];
+    this.currentMap = this.mapKey2;
     this.manualInteraction = this.noInteraction;
     this.playState = 'character-creation';
 
@@ -90,8 +103,9 @@ export class DungeonComponent implements OnInit {
     let mapRow = [];
     let startCoords: [number, number] = [-1, -1];
     let exitExists = false;
+    let loot: Item[];
 
-    this.mapKey.forEach((row, y) => {
+    this.currentMap.forEach((row, y) => {
       mapRow = [];
       row.forEach((tile, x) => {
         switch (tile){
@@ -108,12 +122,28 @@ export class DungeonComponent implements OnInit {
             mapRow.push(new EnemyTier1(x, y));
             break;
           }
+          case('E2'): {
+            mapRow.push(new EnemyTier2(x, y));
+            break;
+          }
           case('ER'): {
             mapRow.push(new EmptyRoomTile(x, y));
             break;
           }
-          case('DT'): {
-            mapRow.push(new LockedDoorTile(x, y));
+          case('DN'): {
+            mapRow.push(new LockedDoorTile(x, y, 'north'));
+            break;
+          }
+          case('DS'): {
+            mapRow.push(new LockedDoorTile(x, y, 'south'));
+            break;
+          }
+          case('DE'): {
+            mapRow.push(new LockedDoorTile(x, y, 'east'));
+            break;
+          }
+          case('DW'): {
+            mapRow.push(new LockedDoorTile(x, y, 'west'));
             break;
           }
           case('XT'): {
@@ -122,11 +152,23 @@ export class DungeonComponent implements OnInit {
             break;
           }
           case('LE'): {
-            const loot: Item[] = [new EmptyVial()];
+            loot = [new EmptyVial()];
             mapRow.push(new LootTile(x, y, loot));
             break;
           }
-          default: break;
+          case('LK'): {
+            loot = [new OrnateKey()];
+            mapRow.push(new LootTile(x, y, loot));
+            break;
+          }
+          case('LC'): {
+            loot = [new WoodCane()];
+            mapRow.push(new LootTile(x, y, loot));
+            break;
+          }
+          default: {
+            console.warn('Unknown maptile : ', tile);
+          }
         }
       });
       map.push(mapRow);
@@ -255,11 +297,29 @@ export class DungeonComponent implements OnInit {
   }
 
   unlockTile(path: BlockedPath): void {
-    const newX = this.player.x + path.direction[0];
-    const newY = this.player.y + path.direction[1];
+    const xy = this.getXYfromDirection(path.direction);
+    const newX = this.player.x + xy[0];
+    const newY = this.player.y + xy[1];
     this.worldMap[newY][newX] = this.getOpenedPathTile(path.mapTileKey, newX, newY);
-    this.mapKey[newY][newX] = path.mapTileKey;
+    this.currentMap[newY][newX] = path.mapTileKey;
     this.miniMap.generateMiniMap();
+  }
+
+  getXYfromDirection(direction: string): [number, number] {
+    switch (direction) {
+      case('north'): {
+        return [0, -1];
+      }
+      case('south'): {
+        return [0, 1];
+      }
+      case('east'): {
+        return [1, 0];
+      }
+      default: {
+        return [-1, 0]
+      }
+    }
   }
 
   getOpenedPathTile(tileKey: TileKey, x: number, y: number): MapTile {
@@ -276,8 +336,17 @@ export class DungeonComponent implements OnInit {
       case('ER'): {
         return new EmptyRoomTile(x, y);
       }
-      case('DT'): {
-        return new LockedDoorTile(x, y);
+      case('DN'): {
+        return new LockedDoorTile(x, y, 'north');
+      }
+      case('DS'): {
+        return new LockedDoorTile(x, y, 'south');
+      }
+      case('DE'): {
+        return new LockedDoorTile(x, y, 'east');
+      }
+      case('DW'): {
+        return new LockedDoorTile(x, y, 'west');
       }
       case('XT'): {
         return new ExitTile(x, y);

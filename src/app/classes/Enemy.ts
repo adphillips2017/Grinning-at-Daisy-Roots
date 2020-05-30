@@ -255,5 +255,6 @@ export {
     Mutant,
     Demogorgon,
     getRandomTier1Enemy,
+    getRandomTier2Enemy,
     getRandomInt
 };
