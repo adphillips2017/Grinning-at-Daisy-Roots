@@ -1,7 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Player } from 'src/app/classes/Player';
-import { MapTile } from 'src/app/classes/MapTiles';
-import { MapKey, TileKey } from 'src/app/models/MapKey';
+import { MapKey, TileKey, RoomTypesArray } from 'src/app/models/MapKey';
 
 @Component({
   selector: 'app-mini-map',
@@ -42,10 +41,7 @@ export class MiniMapComponent implements OnInit {
   tileIsRoom(column: string): boolean {
     if (!column) { return false; }
 
-    let isRoom = false;
-    if (['ER', 'ST', 'XT', 'E1', 'E2', 'E3'].indexOf(column) >= 0) { isRoom = true; }
-
-    return isRoom;
+    return RoomTypesArray.indexOf(column) >= 0;
   }
 
   tileAt(x: number, y: number): TileKey {

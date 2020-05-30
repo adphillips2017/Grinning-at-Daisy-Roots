@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { Player } from 'src/app/classes/Player';
-import { MapTile, ExitTile, EmptyRoomTile, StartTile, EnemyTier1 } from '../../classes/MapTiles';
+import { MapTile, ExitTile, EmptyRoomTile, StartTile, EnemyTier1, LootTile } from '../../classes/MapTiles';
 import { Map } from '../../models/Map';
 import { MapKey } from 'src/app/models/MapKey';
 import { PlayerInteraction } from 'src/app/models/PlayerInteraction';
@@ -50,7 +50,7 @@ export class DungeonComponent implements OnInit {
     ['--', 'E1', 'ER', 'ER', 'E1'],
     ['ER', 'ER', 'E1', '--', 'ER'],
     ['--', 'ST', '--', 'XT', 'E1'],
-    ['--', 'ER', '--', 'ER', 'E1']
+    ['--', 'LE', '--', 'ER', 'E1']
   ];
 
   staminaCost = {
@@ -109,6 +109,11 @@ export class DungeonComponent implements OnInit {
           case('XT'): {
             mapRow.push(new ExitTile(x, y));
             exitExists = true;
+            break;
+          }
+          case('LE'): {
+            const loot: Item[] = [new EmptyVial()];
+            mapRow.push(new LootTile(x, y, loot));
             break;
           }
           default: break;
@@ -278,13 +283,34 @@ export class DungeonComponent implements OnInit {
   }
 
   takeItem(command: string[]): void {
-    if (!command) {
+    if (!command[1]) {
       if (this.currentTile().availableLoot.length > 1) {
         this.output('You didn\'t pass in an item number to take, but you do see ' + this.getAvailableLootString());
       } else {
         this.output('There\'s nothing lying around worth taking.');
         return;
       }
+    }
+
+    if (command[1] === 'chest') {
+      if (this.currentTile() instanceof LootTile && this.currentTile().availableLoot.length > 0) {
+        this.output('You walk slowly up to the wooden chest, unsure of what it might contain.');
+        this.output('You stop before it.  Staring down at it you hesitate.  You have doubts as to the pleasantness of its contents.');
+        this.output('You\'re curiousity gets the better of you and you slowly lift the lid of the chest to reveal its contents.');
+        this.currentTile().currentState = 2;
+        this.currentTile().availableLoot.forEach(item => {
+          this.output(this.player.giveItem(item));
+        });
+        this.currentTile().availableLoot = [];
+      } else if (this.currentTile() instanceof LootTile && this.currentTile().availableLoot.length <= 0) {
+        this.output('You stare at the empty chest and contemplate how you could possibly loot it?');
+        this.output('Maybe you could take the chest itself!');
+        this.output('...');
+        this.output('... no, you had better not.');
+      } else {
+        this.output('There is no such thing to loot in the room.. You must be going mad.');
+      }
+      return;
     }
 
     const takeChoice = parseInt(command[1], 10);
@@ -545,6 +571,7 @@ export class DungeonComponent implements OnInit {
       return;
     }
 
+    if (this.currentTile() instanceof StartTile) { this.currentTile().currentState = 2; }
     if (this.contains(direction, this.northKeywords)){
       this.player.moveNorth();
       this.output(movementMessage + 'north.');

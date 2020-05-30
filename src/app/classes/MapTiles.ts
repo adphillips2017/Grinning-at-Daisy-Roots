@@ -77,6 +77,28 @@ class StartTile extends MapTile {
     }
 }
 
+class LootTile extends MapTile {
+    constructor(x: number, y: number, availableLoot: Item[]){
+        const description = 'This room is similar enough to the rest of the rooms you have had the displeasure of encountering.  The main difference being, of course, the wooden chest which yearns for your attention.';
+        const descriptionOpened = 'This room is similar enough to the rest of the rooms you have had the displeasure of encountering.  The main difference being, of course, the wooden chest which you have already plundered.';
+        const states: TileStates = {
+            1: {
+                image: 'chest-closed.png',
+                intro: 'You step into the room and immidiately your eyes are drawn to the large wooden chest that sits squarely in the middle of the room.  Surely it holds something useful?',
+                description,
+                interaction: noInteraction
+            },
+            2: {
+                image: 'chest-open.png',
+                intro: 'You step into the room and immidiately your eyes are drawn to the large wooden chest that sits squarely in the middle of the room.  You remember it fondly.',
+                description: descriptionOpened,
+                interaction: noInteraction
+            }
+        };
+        super(x, y, states, [], availableLoot);
+    }
+}
+
 
 
 class EmptyRoomTile extends MapTile {
@@ -125,5 +147,6 @@ export {
     StartTile,
     EmptyRoomTile,
     EnemyTier1,
-    ExitTile
+    ExitTile,
+    LootTile
 };
