@@ -213,7 +213,7 @@ class Demogorgon extends Enemy {
 
 
 
-function getRandomInt(max) {
+function getRandomInt(max: number) {
     const randomNumber = Math.floor(Math.random() * Math.floor(max));
     if (randomNumber < 1) { return 1; }
 

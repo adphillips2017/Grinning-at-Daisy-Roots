@@ -8,7 +8,7 @@ import { PlayerInteraction } from 'src/app/models/PlayerInteraction';
 import { Enemy, getRandomInt } from 'src/app/classes/Enemy';
 import { TerminalMessage } from 'src/app/models/TerminalMessage';
 import { Loot } from 'src/app/models/Loot';
-import { Item, OrnateKey } from 'src/app/classes/Items';
+import { Item, OrnateKey, Note } from 'src/app/classes/Items';
 import { MiniMapComponent } from 'src/app/modules/mini-map/mini-map.component';
 import { Consumable, EmptyVial, BloodVial } from 'src/app/classes/Consumables';
 import { Equipment, WoodCane } from 'src/app/classes/Equipment';
@@ -62,7 +62,7 @@ export class DungeonComponent implements OnInit {
     ['--', '--', '--', 'E1', 'ER', '--', 'LE', 'ER', 'ER', 'E1', '--', '--', '--', '--', '--'],
     ['LK', 'E2', 'LC', 'E1', 'ER', 'ER', 'E1', '--', '--', 'ER', 'LE', '--', '--', 'ER', 'E1'],
     ['--', '--', '--', 'ER', '--', '--', 'ER', 'E1', '--', 'ER', 'E2', 'DE', '--', 'E2', 'LE'],
-    ['--', '--', '--', 'ER', 'E1', 'LE', 'E1', 'ER', 'ER', 'E1', 'ER', '--', '--', 'E1', '--'],
+    ['--', '--', '--', 'ER', 'E1', 'N1', 'E1', 'ER', 'ER', 'E1', 'ER', '--', '--', 'E1', '--'],
     ['--', '--', '--', '--', '--', 'ER', '--', '--', '--', 'ER', '--', '--', '--', 'ER', 'ER'],
     ['--', '--', '--', '--', '--', 'ST', '--', '--', '--', 'LE', '--', '--', '--', 'E2', '--'],
     ['--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', '--', 'XT', '--']
@@ -149,6 +149,11 @@ export class DungeonComponent implements OnInit {
           case('XT'): {
             mapRow.push(new ExitTile(x, y));
             exitExists = true;
+            break;
+          }
+          case('N1'): {
+            loot = [new EmptyVial(), new Note(1)];
+            mapRow.push(new LootTile(x, y, loot));
             break;
           }
           case('LE'): {
@@ -462,15 +467,6 @@ export class DungeonComponent implements OnInit {
   }
 
   takeItem(command: string[]): void {
-    if (!command[1]) {
-      if (this.currentTile().availableLoot.length > 1) {
-        this.output('You didn\'t pass in an item number to take, but you do see ' + this.getAvailableLootString());
-      } else {
-        this.output('There\'s nothing lying around worth taking.');
-        return;
-      }
-    }
-
     if (this.currentTile() instanceof LootTile) {
       if (this.currentTile().availableLoot.length > 0) {
         this.output('You walk slowly up to the wooden chest, unsure of what it might contain.');
@@ -488,6 +484,15 @@ export class DungeonComponent implements OnInit {
         this.output('... no, you had better not.');
       }
       return;
+    }
+
+    if (!command[1]) {
+      if (this.currentTile().availableLoot.length > 1) {
+        this.output('You didn\'t pass in an item number to take, but you do see ' + this.getAvailableLootString());
+      } else {
+        this.output('There\'s nothing lying around worth taking.');
+        return;
+      }
     }
 
     const takeChoice = parseInt(command[1], 10);
