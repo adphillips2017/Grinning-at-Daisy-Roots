@@ -1,8 +1,4 @@
-<div class="mini-map">
-    <!-- <div class="map-row" *ngFor="let row of miniMap">
-        <div class="map-tile" [class.room]="tileIsRoom(column)" *ngFor="let column of row"></div>
-    </div> -->
-
+<div class="mini-map" title="Click for full map">
     <div class="map-row">
         <div class="map-tile" [class.room]="tileIsRoom(miniMap[0][0])"></div>
         <div class="map-tile" [class.room]="tileIsRoom(miniMap[0][1])"><div class="north">N</div></div>

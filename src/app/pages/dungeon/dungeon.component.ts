@@ -27,7 +27,7 @@ export class DungeonComponent implements OnInit {
   playerActions: number;
   worldMap: Map;
 
-  playState: 'character-creation' | 'game-canvas' | 'map';
+  playState: 'character-creation' | 'game-canvas' | 'big-map';
 
   helpKeywords = ['help'];
   moveKeywords = ['go', 'walk', 'travel', 'move', 'w', 'step', 'run', 'm'];
@@ -44,6 +44,7 @@ export class DungeonComponent implements OnInit {
   westKeywords = ['left', 'west', 'w', 'l'];
   takeKeywords = ['take', 't', 'loot', 'grab', 'pick-up'];
   openKeywords = ['open', 'unlock', 'force'];
+  mapKeywords = ['map'];
 
   noInteraction: PlayerInteraction = { type: 'none', actions: [] };
 
@@ -182,6 +183,9 @@ export class DungeonComponent implements OnInit {
     }
     else if (this.contains(keyword, this.openKeywords)) {
       this.open();
+    }
+    else if (this.contains(keyword, this.mapKeywords)) {
+      this.playState = 'big-map';
     }
     else {
       this.output('Command not recognized, please try again.');

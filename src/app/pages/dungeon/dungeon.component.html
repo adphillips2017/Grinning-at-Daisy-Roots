@@ -1,4 +1,3 @@
-
 <div class="game-canvas" *ngIf="playState === 'game-canvas'">
     <div class="hud-container">
         <app-hero-panel [stats]="player.getStats()"></app-hero-panel>
@@ -11,12 +10,16 @@
         </div>
 
         <div class="right-column">
-            <app-mini-map [player]="player" [mapKey]="mapKey"></app-mini-map>
+            <app-mini-map [player]="player" [mapKey]="mapKey" (click)="playState = 'big-map'"></app-mini-map>
             <app-information-panel [player]="player"></app-information-panel>
         </div>
     </div>
 </div>
 
-<div class="character-creator" *ngIf="playState === 'character-creation'">
+<div class="full-screen" *ngIf="playState === 'character-creation'">
     <app-character-creator [player]="player" (playerFinalized)="playerFinalized($event)"></app-character-creator>
+</div>
+
+<div class="full-screen" *ngIf="playState === 'big-map'">
+    <app-big-map [map]="worldMap" [playerX]="player.x" [playerY]="player.y" (closeMap)="playState = 'game-canvas'"></app-big-map>
 </div>

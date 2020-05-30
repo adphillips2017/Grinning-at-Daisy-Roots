@@ -1,0 +1,79 @@
+.container {
+    display: flex;
+}
+
+.legend {
+    height: 9.5rem;
+    width: 10rem;
+    background-color: white;
+    border: 10px solid black;
+    justify-content: space-around;
+    margin-right: 3rem;
+
+    .items {
+        padding: 1rem;
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            width: 8rem;
+            margin-bottom: 1rem;
+
+            .color {
+                height: 1rem;
+                width: 1rem;
+                border: 1px solid black;
+            }
+
+            .label {
+                width: 6rem;
+                text-align: right;
+            }
+        }
+    }
+}
+
+.big-map {
+    background-color: black;
+    border: 10px solid black;
+    max-width: 75vw;
+    max-height: 80vh;
+    overflow: auto;
+
+    .map-row {
+        display: flex;
+    }
+}
+
+.map-tile {
+    width: 4rem;
+    height: 4rem;
+    border: 1px solid black;
+}
+
+.traveled {
+    background-color: white;
+}
+.found {
+    background-color: gray;
+}
+.currentTile {
+    background-color: green !important;
+}
+.unknown {
+    background-color: black;
+}
+
+.close-div {
+    margin-left: 1rem;
+    background-color: white;
+    height: 100%;
+    padding: .5rem;
+    border: 5px solid black;
+    cursor: pointer;
+
+    &:hover {
+        background-color: black;
+        color: white;
+    }
+}

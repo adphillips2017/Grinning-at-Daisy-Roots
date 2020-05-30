@@ -7,6 +7,7 @@ import { HeroPanelModule } from '../../modules/hero-panel/hero-panel.module';
 import { TerminalModule } from '../../modules/terminal/terminal.module';
 import { MiniMapModule } from '../../modules/mini-map/mini-map.module';
 import { CharacterCreatorModule } from '../../modules/character-creator/character-creator.module';
+import { BigMapModule } from '../../modules/big-map/big-map.module';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { CharacterCreatorModule } from '../../modules/character-creator/characte
     TerminalModule,
     MiniMapModule,
     InformationPanelModule,
-    CharacterCreatorModule
+    CharacterCreatorModule,
+    BigMapModule
   ],
   exports: [DungeonComponent]
 })
