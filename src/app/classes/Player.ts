@@ -84,6 +84,7 @@ export class Player {
     ageBloodVials(): void {
         this.inventory.forEach(item => {
             if (item instanceof BloodVial) {
+                if (item.age >= 10){ return; }
                 this.removeItem(item);
                 this.giveItem(new BloodVial(item.age + 1));
             }

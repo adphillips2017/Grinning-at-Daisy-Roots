@@ -610,7 +610,9 @@ export class DungeonComponent implements OnInit {
   handleCombat(actions: string[], playerCommand: string[]){
     if (this.contains(playerCommand[0], this.attackKeywords) && this.contains('attack', actions)){
       if (!this.player.hasEnoughStamina(this.staminaCost.combat)) {
-        this.output('You don\'t have enough stamina for that!');
+        this.output('You are exhausted and must take a moment to gather your strength.');
+        this.output('Stamina +2');
+        this.player.stamina += 2;
         return;
       }
       const playerDamage = this.player.getDamage();
@@ -627,7 +629,7 @@ export class DungeonComponent implements OnInit {
         if (lootRoll) {
           const lootItem = this.getLoot(this.currentEnemy().loot, lootRoll);
           this.currentTile().availableLoot.push(lootItem);
-          this.output('The ' + this.currentEnemy().name + ' dropped ' + lootItem.label + '.');
+          this.output('The ' + this.currentEnemy().name + ' dropped ' + lootItem.label + ' onto the ground.');
         }
       } else {
         this.output('The ' + this.currentEnemy().name + ' has ' + this.currentEnemy().getHealth() + ' health left.');
@@ -635,7 +637,9 @@ export class DungeonComponent implements OnInit {
     }
     else if (this.contains(playerCommand[0], this.fleeKeywords) && this.contains('flee', actions)) {
       if (!this.player.hasEnoughStamina(this.staminaCost.flee)) {
-        this.output('You don\'t have enough stamina for that!');
+        this.output('You are exhausted and must take a moment to gather your strength.');
+        this.output('Stamina +2');
+        this.player.stamina += 2;
         return;
       }
       if (this.attemptToFlee(playerCommand)) {

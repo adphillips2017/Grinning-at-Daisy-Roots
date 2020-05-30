@@ -120,7 +120,7 @@ class LockedDoorTile extends MapTile {
         intro += ' One of the doors in this room has not been left agape like all the ones before, no, this door is shut.  Upon closer inspection, ';
         intro += 'the door is not only shut but also locked.  How peculiar.  The lock is fashioned from metal;  the design intricate and beautiful.';
         const description = 'You search the room up and down, but you cannot find any key lying about.  Perhaps one is hidden in another room?';
-        let introTwo = 'You enter the room which, although looks similar at first to many others you\ve seen before, is distincly different.';
+        let introTwo = 'You enter the room which, although looks similar at first to many others you\'ve seen before, is distincly different.';
         introTwo += ' The door in this room is has not been left agape like all the ones before, no, this door is shut.  Upon closer inspection, ';
         introTwo += 'you notice that the door is infact unlocked.  Yes, now you recognize this room.  You\'ve been here before.  Are you going in circles?';
         let descriptionTwo = 'You search the room up and down, but you cannot find anything different about the room since the last time you were here. ';

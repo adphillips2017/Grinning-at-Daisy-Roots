@@ -93,7 +93,7 @@ class Arachnid extends Enemy {
             },
             2: {
                 image: 'arachnid-dead.png',
-                intro: 'You step into the remnants of a battle you\ve already won.  The creature\'s lifeless carcass lies in the center of the room. You walk around it to the center of the room.',
+                intro: 'You step into the remnants of a battle you\'ve already won.  The creature\'s lifeless carcass lies in the center of the room. You walk around it to the center of the room.',
                 description: 'The room is in disarray in the wake of the battle that took place here.  The carcass is beginning to turn, the smell stings your nostrils.',
                 interaction: noInteraction
             }
@@ -129,7 +129,7 @@ class Locust extends Enemy {
             },
             2: {
                 image: 'insect-dead.png',
-                intro: 'You step into the remnants of a battle you\ve already won.  The creature\'s lifeless carcass lies in the center of the room. You walk around it to the center of the room.',
+                intro: 'You step into the remnants of a battle you\'ve already won.  The creature\'s lifeless carcass lies in the center of the room. You walk around it to the center of the room.',
                 description: 'The room is in disarray in the wake of the battle that took place here.  The carcass is beginning to turn, the smell stings your nostrils.',
                 interaction: noInteraction
             }
@@ -152,20 +152,20 @@ class Mutant extends Enemy {
             { chance: 75, item: new Teeth(5) },
             { chance: 100, item: new StaleBread(2) }
         ];
-        const aliveText = 'A large flying creature appears to defend its nest.  Is that a locust? How did it get so big?';
-        const description = 'The locust is the size of a small human, bigger than any insect you\'ve ever seen. The sound of its wings is terrible and unsettling.';
-        const name = 'Locust';
+        const aliveText = 'A towering humanoid creature is standing in the room... it\'s arms are grotesque flaps of rigid skin, its mouth missing lips.. it\'s revulting.';
+        const description = 'The Mutant creature disgusts and scares you.';
+        const name = 'Mutant';
         const fleeChance = 40;
         const tileStates: TileStates = {
             1: {
-                image: 'insect-alive.png',
+                image: 'cockroach-man-alive.png',
                 intro: 'You step into a room that appears to be the nesting grounds of something. ' + aliveText,
                 description: 'The room is surprisingly intact considering the size and temperament of the creature before you.',
                 interaction: { type: 'combat', actions: ['attack', 'flee', 'inspect']}
             },
             2: {
-                image: 'insect-dead.png',
-                intro: 'You step into the remnants of a battle you\ve already won.  The creature\'s lifeless carcass lies in the center of the room. You walk around it to the center of the room.',
+                image: 'cockroach-man-dead.png',
+                intro: 'You step into the remnants of a battle you\'ve already won.  The creature\'s lifeless carcass lies in the center of the room. You walk around it to the center of the room.',
                 description: 'The room is in disarray in the wake of the battle that took place here.  The carcass is beginning to turn, the smell stings your nostrils.',
                 interaction: noInteraction
             }
@@ -190,7 +190,7 @@ class Demogorgon extends Enemy {
         ];
         const aliveText = 'A large large creature that appears not of this world appears before you.  You\'ve seen this monster before, you\'re sure of it.  Yes, in a book.  It\'s called a Demogorgon.';
         const description = 'The Demogorgon stands at least 7 feet tall.  It looks athletic and disgustingly grotesque. The entirety of its head is but a gaping toothed hole which it closes and opens menacingly. ';
-        const name = 'Locust';
+        const name = 'Demogorgon';
         const fleeChance = 40;
         const tileStates: TileStates = {
             1: {
@@ -201,7 +201,7 @@ class Demogorgon extends Enemy {
             },
             2: {
                 image: 'demogorgon-dead.png',
-                intro: 'You step into the remnants of a battle you\ve already won.  The creature\'s lifeless carcass lies in the center of the room. You walk around it to the center of the room.',
+                intro: 'You step into the remnants of a battle you\'ve already won.  The creature\'s lifeless carcass lies in the center of the room. You walk around it to the center of the room.',
                 description: 'The room is in disarray in the wake of the battle that took place here.  The carcass is beginning to turn, the smell stings your nostrils.',
                 interaction: noInteraction
             }
@@ -210,7 +210,6 @@ class Demogorgon extends Enemy {
         super(health, strength, defense, haste, xp, tier, loot, description, name, fleeChance, tileStates);
     }
 }
-
 
 
 function getRandomInt(max: number) {
@@ -235,8 +234,8 @@ function getRandomTier1Enemy(): Enemy {
 }
 
 function getRandomTier2Enemy(): Enemy {
-    const tier1Count = 2;
-    const roll = getRandomInt(tier1Count);
+    const tier2Count = 2;
+    const roll = getRandomInt(tier2Count);
 
     switch (roll){
         case(1): {
