@@ -1,9 +1,10 @@
 import { Item } from './Items';
 import { Equipment } from './Equipment';
-import { BloodVial, Consumable, EmptyVial } from './Consumables';
+import { BloodVial, Consumable } from './Consumables';
 import { Effect } from '../models/Effect';
 
 export class Player {
+    name: string;
     private health: number;
     private inventory: Item[];
     private xpLevels: number[];
@@ -28,24 +29,25 @@ export class Player {
     temporaryEffects: Effect[];
 
     constructor() {
+        this.name = 'You';
         this.maxHealth = 100;
         this.health = 100;
         this.attack = 1;
         this.equipment = [];
         this.inventory = [];
-        this.strength = 4;
+        this.strength = 0;
         this.maxStamina = 25;
         this.stamina = 25;
-        this.intelligence = 4;
-        this.perception = 4;
+        this.intelligence = 0;
+        this.perception = 0;
         this.defense = 0;
-        this.luck = 2;
+        this.luck = 0;
         this.x = 1;
         this.y = 2;
         this.xpLevels = [5, 7, 10, 15, 20];
         this.level = 0;
         this.xp = 0;
-        this.unallocatedPoints = 0;
+        this.unallocatedPoints = 15;
         this.isAlive = true;
         this.actionCount = 0;
         this.temporaryEffects = [];
@@ -258,6 +260,14 @@ export class Player {
         }
 
         this.health = Math.round((this.health + Number.EPSILON) * 100) / 100;
+    }
+
+    setHealth(health: number): void {
+        this.health = health;
+    }
+
+    setStamina(stamina: number): void {
+        this.stamina = stamina;
     }
 
     modifyStamina(modifier: number): void {

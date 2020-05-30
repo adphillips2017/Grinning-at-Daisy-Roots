@@ -6,7 +6,7 @@
             <img class="main-image" [src]="getCurrentImage()" alt="main.jpg">
             <div class="terminal">
                 <app-terminal-display [messages]="messages"></app-terminal-display>
-                <app-terminal-input (issueCommand)="issueCommand($event)"></app-terminal-input>
+                <app-terminal-input (issueCommand)="issueCommand($event)" [name]="player.name"></app-terminal-input>
             </div>
         </div>
 
@@ -18,5 +18,5 @@
 </div>
 
 <div class="character-creator" *ngIf="playState === 'character-creation'">
-    <app-character-creator [player]="player"></app-character-creator>
+    <app-character-creator [player]="player" (playerFinalized)="playerFinalized($event)"></app-character-creator>
 </div>

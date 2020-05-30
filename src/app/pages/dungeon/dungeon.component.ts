@@ -59,19 +59,18 @@ export class DungeonComponent implements OnInit {
     search: -3
   };
 
-
   ngOnInit() {
     this.play();
   }
 
   play(): void {
-    this.playState = 'character-creation';
     this.player = new Player();
     this.messages = [];
     this.currentLevel = 1;
     this.playerActions = 0;
     this.worldMap = [];
     this.manualInteraction = this.noInteraction;
+    this.playState = 'character-creation';
 
     this.output('You open your eyes and find yourself draped over a messy desk, the cherry wood cool against your perspiring face.');
     this.output('As you sit up your eyes adjust to the light and you begin to see the dimly lit interior of a room you don\'t recognize.');
@@ -128,6 +127,7 @@ export class DungeonComponent implements OnInit {
   }
 
   issueCommand(playerInput: string): void {
+    if (playerInput === 'suicide') { this.play(); return; }
     this.output(playerInput, true);
     this.parseCommand(playerInput);
   }
@@ -660,5 +660,10 @@ export class DungeonComponent implements OnInit {
     });
 
     return returnString;
+  }
+
+  playerFinalized(player: Player): void {
+    this.player = player;
+    this.playState = 'game-canvas';
   }
 }

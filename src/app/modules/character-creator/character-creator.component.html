@@ -1,18 +1,49 @@
 <div class="creator">
-    <div class="title">Grinning at Daisy Roots</div>
-    <div class="about">
-        Welcome.  Grinning at Daisy Roots is a simple text based game that is very much still in development.
-        The game consists of a simple map made up of different types of tiles, some of which you are able to
-        interact with using simple commands.  The commands are listed and described in the Commands Panel to
-        the right of the main display, under the mini map.  You'll also find your items and equipment there.
-        The mini map is there to help show you which directions you can walk at any given time.  Before you
-        begin, though, you need to name your character and allocate your available stat points.
+    <div class="title" *ngIf="player.level === 0; else levelUp">Grinning at Daisy Roots</div>
+    <ng-template #levelUp> <div class="title">Level {{player.level}}</div> </ng-template>
+
+    <div class="panels">
+        <div class="left-panel">
+            <div class="about" *ngIf="player.level === 0">
+                Welcome.  Grinning at Daisy Roots is a simple text based game that is very much still in development.
+                The game consists of a simple map made up of different types of tiles, some of which you are able to
+                interact with using simple commands.  The commands are listed and described in the Commands Panel to
+                the right of the main display, under the mini map.  You'll also find your items and equipment there.
+                The mini map is there to help show you which directions you can walk at any given time.  Before you
+                begin, though, you need to name your character and allocate your stat points.  Or don't, it's up to you.
+            </div>
+
+            <div class="form">
+                <div class="question">
+                    <div class="label">Name</div>
+                    <div class="answer"><input [(ngModel)]="playerName" class="name-input" type="text"></div>
+                </div>
+
+                <div class="question" *ngFor="let stat of playerStats">
+                    <div class="label">{{stat.label}}</div>
+                    <div class="answer">
+                        <button [disabled]="!canDecrease(stat)" class="stat-button" (click)="decreaseStat(stat)">-</button>
+                        <div class="stat-value">{{ player[stat.stat] }}</div>
+                        <button [disabled]="!canIncrease()" class="stat-button" (click)="increaseStat(stat)">+</button>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="label">Remaining</div>
+                    <div class="answer">{{placeHolderPlayer.unallocatedPoints}}</div>
+                </div>
+
+                <div class="question last">
+                    <div class="label"></div>
+                    <div class="answer">
+                        <button (click)="finalizePlayer()" class="stat-button">Finalize</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="right-panel">
+            <app-hero-panel [stats]="player.getStats()"></app-hero-panel>
+        </div>
     </div>
 
-    <div class="form">
-        <div class="question">Name</div>
-        <div class="answer"><input type="text"></div>
-
-        
-    </div>
 </div>

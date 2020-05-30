@@ -9,5 +9,5 @@ import { Player } from 'src/app/classes/Player';
 export class InformationPanelComponent {
   @Input() player: Player;
 
-  activeTab = 'inventory';
+  activeTab = 'commands';
 }

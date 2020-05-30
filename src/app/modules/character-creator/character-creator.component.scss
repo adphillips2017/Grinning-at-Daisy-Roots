@@ -1,11 +1,68 @@
 .creator {
     background: white;
     height: 70vh;
-    width: 50vw;
+    width: 60vw;
     margin-top: 2rem;
     border: 10px solid black;
 
     .title {
-        
+        font-size: 3rem;
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .panels {
+        display: flex;
+        padding: 1rem;
+        justify-content: space-around;
+
+        .left-panel {
+            width: 55%;
+
+            .about {
+                margin-bottom: 2rem;
+            }
+
+            .form {
+                .question {
+                    display: flex;
+                    justify-content: space-between;
+                    padding-bottom: .5rem;
+                    padding-top: .5rem;
+                    border-bottom: 1px dashed black;
+
+                    .name-input {
+                        text-align: right;
+                    }
+
+                    .answer {
+                        display: flex;
+                        justify-content: space-around;
+
+                        .stat-button {
+                            cursor: pointer;
+                            background-color: #6d231b;
+                            color: white;
+
+                            &:hover {
+                                background-color: black;
+                            }
+
+                            &:disabled {
+                                background-color: lightgray;
+                                color: black;
+                            }
+                        }
+
+                        .stat-value {
+                            width: 2rem;
+                            text-align: center;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
+
+.last { border-bottom: none !important; }

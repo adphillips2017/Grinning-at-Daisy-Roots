@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 
 @Component({
   selector: 'app-terminal-input',
@@ -6,6 +6,7 @@ import { Component, Output, EventEmitter } from '@angular/core';
   styleUrls: ['./terminal-input.component.scss']
 })
 export class TerminalInputComponent {
+  @Input() name = '';
   @Output() issueCommand = new EventEmitter<string>();
   commandHistory: string[] = [];
   currentCommand = 0;
