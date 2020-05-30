@@ -1,16 +1,23 @@
-import { Component, Output, EventEmitter, Input } from '@angular/core';
+import { Component, Output, EventEmitter, Input, OnInit, ViewChild, ElementRef } from '@angular/core';
 
 @Component({
   selector: 'app-terminal-input',
   templateUrl: './terminal-input.component.html',
   styleUrls: ['./terminal-input.component.scss']
 })
-export class TerminalInputComponent {
+export class TerminalInputComponent implements OnInit {
+  @ViewChild('terminalInput') terminalInput: ElementRef;
   @Input() name = '';
   @Output() issueCommand = new EventEmitter<string>();
   commandHistory: string[] = [];
   currentCommand = 0;
   command = '';
+
+  ngOnInit() {
+    setTimeout(() => { // this will make the execution after the above boolean has changed
+      this.terminalInput.nativeElement.focus();
+    }, 0);
+  }
 
   onSubmit(input: string): void {
     this.commandHistory.unshift(input);

@@ -1,4 +1,4 @@
 <div class="terminal-input">
     <div class="message-prompt">{{name}}<span style="margin-left: 5px;">></span></div>
-    <input class="user-command" [(ngModel)]="command" (keyup.enter)="onSubmit(terminal.value)" (keyup.arrowup)="getPreviousCommand()" (keyup.arrowdown)="getNextCommand()" #terminal>
+    <input #terminalInput class="user-command" [(ngModel)]="command" (keyup.enter)="onSubmit(terminal.value)" (keyup.arrowup)="getPreviousCommand()" (keyup.arrowdown)="getNextCommand()" #terminal>
 </div>
