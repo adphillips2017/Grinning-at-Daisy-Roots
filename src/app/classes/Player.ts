@@ -85,7 +85,6 @@ export class Player {
         this.inventory.forEach(item => {
             if (item instanceof BloodVial) {
                 this.removeItem(item);
-                console.log('action count: ', item.age);
                 this.giveItem(new BloodVial(item.age + 1));
             }
         });
@@ -250,7 +249,6 @@ export class Player {
     }
 
     modifyHealth(modifier: number): void {
-        console.log('modifier: ', modifier);
         this.health = this.health + modifier;
         if (this.health < 0) {
             this.health = 0;

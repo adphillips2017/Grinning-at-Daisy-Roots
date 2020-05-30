@@ -22,7 +22,6 @@ export class MiniMapComponent implements OnInit {
   }
 
   generateMiniMap(): void {
-    console.log('here');
     const playerX = this.player.x;
     const playerY = this.player.y;
 

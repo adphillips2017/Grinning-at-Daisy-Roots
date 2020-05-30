@@ -210,7 +210,6 @@ export class DungeonComponent implements OnInit {
             this.unlockTile(path);
           }
         } else {
-          console.log(6);
           if (this.player[solution.type] >= solution.stat) {
             message = solution.flavorText;
             success = true;
@@ -235,7 +234,6 @@ export class DungeonComponent implements OnInit {
     this.worldMap[newY][newX] = this.getOpenedPathTile(path.mapTileKey, newX, newY);
     this.mapKey[newY][newX] = path.mapTileKey;
     this.miniMap.generateMiniMap();
-    console.log('playa', this.player, '\nmap: ', this.worldMap);
   }
 
   getOpenedPathTile(tileKey: TileKey, x: number, y: number): MapTile {
@@ -267,7 +265,6 @@ export class DungeonComponent implements OnInit {
   }
 
   inspect(command: string[]): void {
-    console.log('command: ', command);
     if (!command[1]) {
       this.output('You must inspect something, you cannot just inspect.');
       return;
@@ -581,7 +578,6 @@ export class DungeonComponent implements OnInit {
 
     const rollForFlee = Math.floor(Math.random() * Math.floor(100));
     const maxRoll = this.currentEnemy().fleeChance * this.player.getLuckModifier();
-    console.log('rollforflee: ', rollForFlee, '\nenemyfleechance: ', this.currentEnemy().fleeChance);
     if (rollForFlee > maxRoll) {
       this.output('You weren\'t quick enough to escape.  The ' + this.currentEnemy().name + ' blocked your way.');
       return false;

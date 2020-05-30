@@ -81,7 +81,7 @@ export class CharacterCreatorComponent implements OnInit {
   }
 
   canIncrease(): boolean {
-    if (this.player.unallocatedPoints <= 0){ return false; }
+    if (this.placeHolderPlayer.unallocatedPoints <= 0){ return false; }
     return true;
   }
 
