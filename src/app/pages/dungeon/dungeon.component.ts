@@ -80,6 +80,7 @@ export class DungeonComponent implements OnInit {
     this.output('To your confusion and horror you realize you are completely naked save for your knickers, though you spot a pair of boots lying next to you.');
 
     this.createMap();
+    this.updateMapTileStatuses();
   }
 
   createMap(): void {
@@ -678,32 +679,38 @@ export class DungeonComponent implements OnInit {
 
     this.miniMap.generateMiniMap();
     this.playIntro();
+    this.updateMapTileStatuses();
+    console.log('map: ', this.worldMap);
     if (this.currentTile() instanceof ExitTile) { this.gameOver(); }
   }
 
   playerCanMove(direction: string): boolean {
-    let canMove = false;
-    const currentX = this.player.x;
-    const currentY = this.player.y;
-
     if (this.contains(direction, this.northKeywords)){
-      if (this.tileAt(currentX, currentY - 1)){ canMove = true; }
+      if (this.tileToThe('north')){ return true; }
     }
     else if (this.contains(direction, this.southKeywords)){
-      if (this.tileAt(currentX, currentY + 1)){ canMove = true; }
+      if (this.tileToThe('south')){ return true; }
     }
     else if (this.contains(direction, this.eastKeywords)){
-      if (this.tileAt(currentX + 1, currentY)){ canMove = true; }
+      if (this.tileToThe('east')){ return true; }
     }
     else if (this.contains(direction, this.westKeywords)){
-      if (this.tileAt(currentX - 1, currentY)){ canMove = true; }
+      if (this.tileToThe('west')){ return true; }
     }
     else{
       console.warn('Invalid direction given to playerCanMove().');
     }
 
-    if (!canMove){ this.output('That way appears to be blocked.'); }
-    return canMove;
+    return false;
+  }
+
+  updateMapTileStatuses(): void {
+    this.currentTile().traveled = true;
+
+    if (this.playerCanMove('north')){ this.tileToThe('north').found = true; }
+    if (this.playerCanMove('south')){ this.tileToThe('south').found = true; }
+    if (this.playerCanMove('east')){ this.tileToThe('east').found = true; }
+    if (this.playerCanMove('west')){ this.tileToThe('west').found = true; }
   }
 
   printInventory(): void {
@@ -735,6 +742,29 @@ export class DungeonComponent implements OnInit {
     const x = this.player.x;
     const y = this.player.y;
     return this.tileAt(x, y);
+  }
+
+  tileToThe(direction: string): MapTile {
+    const x = this.player.x;
+    const y = this.player.y;
+
+    switch (direction){
+      case('north'): {
+        return this.tileAt(x, y - 1);
+      }
+      case('south'): {
+        return this.tileAt(x, y + 1);
+      }
+      case('east'): {
+        return this.tileAt(x + 1, y);
+      }
+      case('west'): {
+        return this.tileAt(x - 1, y);
+      }
+      default: {
+        return undefined;
+      }
+    }
   }
 
   currentInteraction(): PlayerInteraction {
