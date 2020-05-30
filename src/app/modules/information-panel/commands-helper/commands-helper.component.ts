@@ -16,7 +16,7 @@ export class CommandsHelperComponent {
   inspectKeywords = ['inspect', 'examine', 'look'];
   fleeKeywords = ['flee'];
   northKeywords = ['up', 'north', 'forward', 'straight', 'n', 'forwards', 'f'];
-  southKeywords = ['down', 'south', 'backward', 'backwards', 's', 'back', 'b'];
+  southKeywords = ['down', 'south', 'backward', 'backwards', 's', 'back', 'b', 'd'];
   eastKeywords = ['right', 'east', 'e', 'r'];
   westKeywords = ['left', 'west', 'w', 'l'];
   takeKeywords = ['take', 't', 'loot', 'grab', 'pick-up'];

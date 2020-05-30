@@ -337,10 +337,7 @@ export class Player {
     }
 
     giveItem(item: Item): string {
-        let itemIndex = -1;
-        this.inventory.forEach((tempItem, index) => {
-            if (tempItem.label === item.label) { itemIndex = index; }
-        });
+        const itemIndex = this.findItemIndex(item);
 
         if (itemIndex > -1){
             this.inventory[itemIndex].count += item.count;
@@ -354,6 +351,14 @@ export class Player {
         }
 
         return item.count + ' ' + item.label + ' added to your inventory.';
+    }
+
+    findItemIndex(item: Item): number {
+        let itemIndex = -1;
+        this.inventory.forEach((tempItem, index) => {
+            if (tempItem.label === item.label) { itemIndex = index; }
+        });
+        return itemIndex;
     }
 
     removeItem(item: Item): void {

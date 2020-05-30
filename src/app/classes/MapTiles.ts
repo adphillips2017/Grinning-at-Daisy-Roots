@@ -2,6 +2,7 @@ import { Enemy, getRandomTier1Enemy } from './Enemy';
 import { PlayerInteraction } from '../models/PlayerInteraction';
 import { Item } from './Items';
 import { PlainMensBoots } from './Equipment';
+import { TileKey } from '../models/MapKey';
 
 const noInteraction: PlayerInteraction = { type: 'none', actions: []};
 const noEnemy = undefined;
@@ -19,6 +20,17 @@ interface TileState {
 }
 interface TileStates {
     [key: number]: TileState;
+}
+interface Solution {
+    type: string;
+    item: Item;
+    stat: number;
+    flavorText: string;
+}
+interface BlockedPath {
+    solutions: Solution[];
+    direction: [number, number];
+    mapTileKey: TileKey;
 }
 
 class MapTile {
@@ -99,7 +111,47 @@ class LootTile extends MapTile {
     }
 }
 
+class LockedDoorTile extends MapTile {
+    blockedPaths: BlockedPath[];
 
+    constructor(x: number, y: number){
+        let intro = 'You enter the room which, although looks similar at first to many others you\'ve seen before, is distincly different.';
+        intro += ' One of the doors in this room has not been left agape like all the ones before, no, this door is shut.  Upon closer inspection, ';
+        intro += 'the door is not only shut but also locked.  How peculiar.  The lock is fashioned from metal;  the design intricate and beautiful.';
+        const description = 'You search the room up and down, but you cannot find any key lying about.  Perhaps one is hidden in another room?';
+        let introTwo = 'You enter the room which, although looks similar at first to many others you\ve seen before, is distincly different.';
+        introTwo += ' The door in this room is has not been left agape like all the ones before, no, this door is shut.  Upon closer inspection, ';
+        introTwo += 'you notice that the door is infact unlocked.  Yes, now you recognize this room.  You\'ve been here before.  Are you going in circles?';
+        let descriptionTwo = 'You search the room up and down, but you cannot find anything different about the room since the last time you were here. ';
+        descriptionTwo += 'It does not appear to have been disturbed by anyone else since last you left.';
+        const states = {
+            1: {
+                image: 'door-closed.png',
+                intro,
+                description,
+                interaction: noInteraction
+            },
+            2: {
+                image: 'door-closed.png',
+                intro: introTwo,
+                description: descriptionTwo,
+                interaction: noInteraction
+            }
+        };
+        super(x, y, states, [], []);
+        const solutions: Solution[] = [
+            { type: 'item', item: new PlainMensBoots(), stat: 0, flavorText: 'Oh wow. You stuck a pair of boots into a key hole. Are you retarded?'}
+        ];
+
+        this.blockedPaths = [
+            {
+                solutions,
+                direction: [0, 1],
+                mapTileKey: 'ER'
+            }
+        ];
+    }
+}
 
 class EmptyRoomTile extends MapTile {
     constructor(x: number, y: number, searchResults: SearchResult[] ){
@@ -126,8 +178,9 @@ class EnemyTier1 extends MapTile {
 
 class ExitTile extends MapTile {
     constructor(x: number, y: number){
-        let intro = 'You see a light brighter than any you\'ve seen since you awoke. ';
-        intro += 'That\'s not just any light.... it\'s the sun!  You\'ve found the exit!';
+        let intro = 'You step into a room with a door. There\'s something different about the door that you can\'t quit place..';
+        intro += 'An odd light is reflecting around the perimeter of the door, where it meets the wall.';
+        intro += 'Wait... That\'s not just any light.... it\'s the sun!  You\'ve found the exit!';
         const description = 'The light of the sun hurts your eyes as fresh air fills your lungs. ';
         const states: TileStates = {
             1: {
@@ -142,11 +195,13 @@ class ExitTile extends MapTile {
 }
 
 export {
+    BlockedPath,
     TileStates,
     MapTile,
     StartTile,
     EmptyRoomTile,
     EnemyTier1,
     ExitTile,
-    LootTile
+    LootTile,
+    LockedDoorTile
 };

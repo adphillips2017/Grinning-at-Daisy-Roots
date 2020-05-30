@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { Player } from 'src/app/classes/Player';
-import { MapTile, ExitTile, EmptyRoomTile, StartTile, EnemyTier1, LootTile } from '../../classes/MapTiles';
+import { MapTile, ExitTile, EmptyRoomTile, StartTile, EnemyTier1, LootTile, LockedDoorTile, BlockedPath } from '../../classes/MapTiles';
 import { Map } from '../../models/Map';
-import { MapKey } from 'src/app/models/MapKey';
+import { MapKey, TileKey } from 'src/app/models/MapKey';
 import { PlayerInteraction } from 'src/app/models/PlayerInteraction';
 import { Enemy, getRandomInt } from 'src/app/classes/Enemy';
 import { TerminalMessage } from 'src/app/models/TerminalMessage';
@@ -11,6 +11,7 @@ import { Loot } from 'src/app/models/Loot';
 import { Item } from 'src/app/classes/Items';
 import { MiniMapComponent } from 'src/app/modules/mini-map/mini-map.component';
 import { Consumable, EmptyVial, BloodVial } from 'src/app/classes/Consumables';
+import { Equipment } from 'src/app/classes/Equipment';
 
 @Component({
   selector: 'app-dungeon',
@@ -38,10 +39,11 @@ export class DungeonComponent implements OnInit {
   inspectKeywords = ['inspect', 'examine', 'look'];
   fleeKeywords = ['flee'];
   northKeywords = ['up', 'north', 'forward', 'straight', 'n', 'forwards', 'f'];
-  southKeywords = ['down', 'south', 'backward', 'backwards', 's', 'back', 'b'];
+  southKeywords = ['down', 'south', 'backward', 'backwards', 's', 'back', 'b', 'd'];
   eastKeywords = ['right', 'east', 'e', 'r'];
   westKeywords = ['left', 'west', 'w', 'l'];
   takeKeywords = ['take', 't', 'loot', 'grab', 'pick-up'];
+  openKeywords = ['open', 'unlock', 'force'];
 
   noInteraction: PlayerInteraction = { type: 'none', actions: [] };
 
@@ -50,7 +52,8 @@ export class DungeonComponent implements OnInit {
     ['--', 'E1', 'ER', 'ER', 'E1'],
     ['ER', 'ER', 'E1', '--', 'ER'],
     ['--', 'ST', '--', 'XT', 'E1'],
-    ['--', 'LE', '--', 'ER', 'E1']
+    ['--', 'DT', '--', 'ER', 'E1'],
+    ['--', '--', '--', '--', '--']
   ];
 
   staminaCost = {
@@ -106,6 +109,10 @@ export class DungeonComponent implements OnInit {
             mapRow.push(new EmptyRoomTile(x, y, []));
             break;
           }
+          case('DT'): {
+            mapRow.push(new LockedDoorTile(x, y));
+            break;
+          }
           case('XT'): {
             mapRow.push(new ExitTile(x, y));
             exitExists = true;
@@ -127,7 +134,6 @@ export class DungeonComponent implements OnInit {
 
     this.worldMap = map;
     this.player.moveTo(startCoords[0], startCoords[1]);
-
     console.log('map: ', map);
   }
 
@@ -173,9 +179,90 @@ export class DungeonComponent implements OnInit {
     else if (this.contains(keyword, this.takeKeywords)) {
       this.takeItem(command);
     }
+    else if (this.contains(keyword, this.openKeywords)) {
+      this.open();
+    }
     else {
       this.output('Command not recognized, please try again.');
       this.output('Type "help" for a list of commands.');
+    }
+  }
+
+  open(){
+    const tile = this.currentTile();
+    if (!(tile instanceof LockedDoorTile)) {
+      this.output('There is no door to open here..');
+      return;
+    }
+
+    let index = -1;
+    let success = false;
+    let message = '';
+    tile.blockedPaths.forEach(path => {
+      if (success) { return; }
+      path.solutions.forEach(solution => {
+        if (success) { return; }
+        if (solution.type === 'item') {
+          index = this.player.findItemIndex(solution.item);
+          if (index > -1) {
+            message = solution.flavorText;
+            success = true;
+            this.unlockTile(path);
+          }
+        } else {
+          console.log(6);
+          if (this.player[solution.type] >= solution.stat) {
+            message = solution.flavorText;
+            success = true;
+            this.unlockTile(path);
+          }
+        }
+      });
+    });
+
+    if (success) {
+      this.output(message);
+    }
+    if (index > -1) {
+      this.output(this.player.getInventory()[index].label + ' removed from inventory.');
+      this.player.removeItem(this.player.getInventory()[index]);
+    }
+  }
+
+  unlockTile(path: BlockedPath): void {
+    const newX = this.player.x + path.direction[0];
+    const newY = this.player.y + path.direction[1];
+    this.worldMap[newY][newX] = this.getOpenedPathTile(path.mapTileKey, newX, newY);
+    this.mapKey[newY][newX] = path.mapTileKey;
+    this.miniMap.generateMiniMap();
+    console.log('playa', this.player, '\nmap: ', this.worldMap);
+  }
+
+  getOpenedPathTile(tileKey: TileKey, x: number, y: number): MapTile {
+    switch (tileKey){
+      case('--'): {
+        return undefined;
+      }
+      case('ST'): {
+        return new StartTile(x, y);
+      }
+      case('E1'): {
+        return new EnemyTier1(x, y);
+      }
+      case('ER'): {
+        return new EmptyRoomTile(x, y, []);
+      }
+      case('DT'): {
+        return new LockedDoorTile(x, y);
+      }
+      case('XT'): {
+        return new ExitTile(x, y);
+      }
+      case('LE'): {
+        const loot: Item[] = [new EmptyVial()];
+        return new LootTile(x, y, loot);
+      }
+      default: return undefined;
     }
   }
 
