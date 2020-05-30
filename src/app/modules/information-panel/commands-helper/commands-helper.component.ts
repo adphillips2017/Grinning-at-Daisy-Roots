@@ -11,7 +11,7 @@ export class CommandsHelperComponent {
   inventoryKeywords = ['i', 'inventory'];
   attackKeywords = ['attack', 'hit', 'strike'];
   equipKeywords = ['equip', 'e'];
-  unequipKeywords = ['unequip', 'un'];
+  unequipKeywords = ['unequip', 'un', 'remove'];
   useKeywords = ['use', 'u'];
   inspectKeywords = ['inspect', 'examine', 'look'];
   fleeKeywords = ['flee'];
@@ -23,6 +23,7 @@ export class CommandsHelperComponent {
   openKeywords = ['open', 'unlock', 'force'];
   mapKeywords = ['map'];
   searchKeywords = ['search', 'forage'];
+  dropKeywords = ['drop', 'destroy'];
 
   commands = [
     {
@@ -79,6 +80,11 @@ export class CommandsHelperComponent {
       label: 'open',
       aliases: this.openKeywords,
       helpText: 'Use this keyword to open closed doors in your current room.  You might not always succeed, but certain items and skills can help.'
+    },
+    {
+      label: 'drop',
+      aliases: this.dropKeywords,
+      helpText: 'Use this keyword to remove unwanted items from your inventory.  They\'ll be on the ground if you change your mind.'
     },
     {
       label: 'north',

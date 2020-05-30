@@ -162,7 +162,7 @@ class EmptyRoomTile extends MapTile {
             1: {
                 image: 'empty-room-a.png',
                 intro: 'You step into a room that appears to be devoid of life and unimportant.',
-                description: 'Looking around you notice nothing out of the ordinary or of any use.',
+                description: 'Looking around you notice nothing out of the ordinary.',
                 interaction: noInteraction
             }
         };

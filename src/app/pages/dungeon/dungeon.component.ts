@@ -34,7 +34,7 @@ export class DungeonComponent implements OnInit {
   inventoryKeywords = ['i', 'inventory'];
   attackKeywords = ['attack', 'hit', 'strike'];
   equipKeywords = ['equip', 'e'];
-  unequipKeywords = ['unequip', 'un'];
+  unequipKeywords = ['unequip', 'un', 'remove'];
   useKeywords = ['use', 'u'];
   inspectKeywords = ['inspect', 'examine', 'look'];
   fleeKeywords = ['flee'];
@@ -46,6 +46,7 @@ export class DungeonComponent implements OnInit {
   openKeywords = ['open', 'unlock', 'force'];
   mapKeywords = ['map'];
   searchKeywords = ['search', 'forage'];
+  dropKeywords = ['drop', 'destroy'];
 
   noInteraction: PlayerInteraction = { type: 'none', actions: [] };
 
@@ -238,6 +239,9 @@ export class DungeonComponent implements OnInit {
     else if (this.contains(keyword, this.searchKeywords)) {
       this.searchRoom();
     }
+    else if (this.contains(keyword, this.dropKeywords)) {
+      this.dropItem(command);
+    }
     else {
       this.output('Command not recognized, please try again.');
       this.output('Type "help" for a list of commands.');
@@ -322,7 +326,7 @@ export class DungeonComponent implements OnInit {
         return [1, 0];
       }
       default: {
-        return [-1, 0]
+        return [-1, 0];
       }
     }
   }
@@ -502,6 +506,27 @@ export class DungeonComponent implements OnInit {
       const takeItem: any = this.currentTile().availableLoot[takeChoice - 1];
       this.output(this.player.giveItem(takeItem));
       this.currentTile().availableLoot.splice(this.currentTile().availableLoot.indexOf(takeItem), 1);
+    }
+  }
+
+  dropItem(command: string[]): void {
+    if (!command[1]) {
+      if (this.player.getInventory().length > 1) {
+        this.output('You didn\'t pass in an item number to drop, but you do have ' + this.player.getInventory());
+      } else {
+        this.output('You have nothing to drop.');
+        return;
+      }
+    }
+
+    const dropChoice = parseInt(command[1], 10);
+    if (isNaN(dropChoice)) { this.output('Invalid drop choice given.'); }
+    else if (dropChoice > this.player.getInventory().length) { this.output('Drop selection out of range.'); }
+    else {
+      const dropItem: Item = this.player.getInventory()[dropChoice - 1];
+      this.output('You drop the ' + dropItem.label + '.');
+      this.player.removeItem(dropItem);
+      this.currentTile().availableLoot.push(dropItem);
     }
   }
 
