@@ -45,6 +45,7 @@ export class DungeonComponent implements OnInit {
   takeKeywords = ['take', 't', 'loot', 'grab', 'pick-up'];
   openKeywords = ['open', 'unlock', 'force'];
   mapKeywords = ['map'];
+  searchKeywords = ['search', 'forage'];
 
   noInteraction: PlayerInteraction = { type: 'none', actions: [] };
 
@@ -108,7 +109,7 @@ export class DungeonComponent implements OnInit {
             break;
           }
           case('ER'): {
-            mapRow.push(new EmptyRoomTile(x, y, []));
+            mapRow.push(new EmptyRoomTile(x, y));
             break;
           }
           case('DT'): {
@@ -187,10 +188,30 @@ export class DungeonComponent implements OnInit {
     else if (this.contains(keyword, this.mapKeywords)) {
       this.playState = 'big-map';
     }
+    else if (this.contains(keyword, this.searchKeywords)) {
+      this.searchRoom();
+    }
     else {
       this.output('Command not recognized, please try again.');
       this.output('Type "help" for a list of commands.');
     }
+  }
+
+  searchRoom(): void {
+    if (this.currentTile().searched) {
+      this.output('You begin to search the room, but then remember that you have already searched this room and give up in frustration.');
+      return;
+    }
+
+    this.currentTile().searched = true;
+    this.output('You begin scouring the room for anything that might be useful.');
+
+    this.currentTile().searchResults.forEach(result => {
+      if (this.player.perception >= result.requirement) {
+        this.output('You happen to find a ' + result.reward.label + ' hidden in the room.');
+        this.output(this.player.giveItem(result.reward));
+      }
+    });
   }
 
   open(){
@@ -253,7 +274,7 @@ export class DungeonComponent implements OnInit {
         return new EnemyTier1(x, y);
       }
       case('ER'): {
-        return new EmptyRoomTile(x, y, []);
+        return new EmptyRoomTile(x, y);
       }
       case('DT'): {
         return new LockedDoorTile(x, y);

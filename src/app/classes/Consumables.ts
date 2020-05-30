@@ -13,7 +13,7 @@ class Consumable extends Item {
 }
 
 class StaleBread extends Consumable {
-    constructor(){
+    constructor(count: number = 1){
         const label = 'Stale Bread';
         const description = 'Bread so old and hard it might be used as a weapon, nevertheless it appears invigorating.';
         const effects = [{ stat: 'stamina', modifier: 5}];
@@ -21,12 +21,12 @@ class StaleBread extends Consumable {
         useText += 'You resort to skipping the incisors entirely and go straight to the molars. It crunches like rock candy but you get it down. ';
         useText += 'You feel slightly invigorated despite the horrid condition of the bread.';
 
-        super(label, description, effects, useText);
+        super(label, description, effects, useText, count);
     }
 }
 
 class EmptyVial extends Consumable {
-    constructor(){
+    constructor(count: number = 1){
         const label = 'Empty Blood Vial';
         const description = 'An empty vial often used by physicians for bloodletting. It is accompanied most conveniently with a needle and surgical tube.';
         const effects = [{ stat: 'health', modifier: 5 }, {stat: 'stamina', modifier: -5 }];
@@ -34,7 +34,7 @@ class EmptyVial extends Consumable {
         useText += ' As the vial begins to turn crimson you feel a sense of relief fall over you, even if it did hurt initially.';
         useText += ' You slip the fresh vial of blood back into your inventory.';
 
-        super(label, description, effects, useText);
+        super(label, description, effects, useText, count);
     }
 }
 

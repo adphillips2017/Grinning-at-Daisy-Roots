@@ -21,6 +21,8 @@ export class CommandsHelperComponent {
   westKeywords = ['left', 'west', 'w', 'l'];
   takeKeywords = ['take', 't', 'loot', 'grab', 'pick-up'];
   openKeywords = ['open', 'unlock', 'force'];
+  mapKeywords = ['map'];
+  searchKeywords = ['search', 'forage'];
 
   commands = [
     {
@@ -32,6 +34,11 @@ export class CommandsHelperComponent {
       label: 'inventory',
       aliases: this.inventoryKeywords,
       helpText: 'Use this keyword to check your inventory.'
+    },
+    {
+      label: 'search',
+      aliases: this.searchKeywords,
+      helpText: 'Use this keyword to search rooms that may appear to be empty.  You never know what you might find.  You\'re perception skill helps here.'
     },
     {
       label: 'take',

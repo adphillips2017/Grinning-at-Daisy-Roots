@@ -1,8 +1,9 @@
-import { Enemy, getRandomTier1Enemy } from './Enemy';
+import { Enemy, getRandomTier1Enemy, getRandomInt } from './Enemy';
 import { PlayerInteraction } from '../models/PlayerInteraction';
-import { Item } from './Items';
+import { Item, OrnateKey, Teeth } from './Items';
 import { PlainMensBoots } from './Equipment';
 import { TileKey } from '../models/MapKey';
+import { StaleBread, EmptyVial } from './Consumables';
 
 const noInteraction: PlayerInteraction = { type: 'none', actions: []};
 const noEnemy = undefined;
@@ -140,7 +141,7 @@ class LockedDoorTile extends MapTile {
         };
         super(x, y, states, [], []);
         const solutions: Solution[] = [
-            { type: 'item', item: new PlainMensBoots(), stat: 0, flavorText: 'Oh wow. You stuck a pair of boots into a key hole. Why did that work!?'},
+            { type: 'item', item: new OrnateKey(), stat: 0, flavorText: 'Oh wow. You stuck a pair of boots into a key hole. Why did that work!?'},
             { type: 'strength', item: undefined, stat: 5, flavorText: 'Oh WOW. You tried the handle to see if it was locked or just stuck, and you ripped the whole locking mechanism clean off!'}
         ];
 
@@ -155,7 +156,8 @@ class LockedDoorTile extends MapTile {
 }
 
 class EmptyRoomTile extends MapTile {
-    constructor(x: number, y: number, searchResults: SearchResult[] ){
+    constructor(x: number, y: number){
+        const searchResults: SearchResult[] = getSearchResults();
         const states: TileStates = {
             1: {
                 image: 'empty-room-a.png',
@@ -193,6 +195,30 @@ class ExitTile extends MapTile {
         };
         super(x, y, states, [], []);
     }
+}
+
+function getSearchResults(): SearchResult[] {
+    const results: SearchResult[] = [];
+    const itemCountRoll = getRandomInt(10) > 6 ? 2 : 1;
+    let itemRoll: number;
+    let difficultyRoll: number;
+
+    for (let i = 0; i < itemCountRoll; i++) {
+        itemRoll  = getRandomInt(6);
+        difficultyRoll = getRandomInt(8);
+
+        if (itemRoll <= 3) {
+            results.push({ stat: 'perception', requirement: difficultyRoll, reward: new StaleBread() });
+        }
+        else if (itemRoll <= 5) {
+            results.push({ stat: 'perception', requirement: difficultyRoll, reward: new Teeth(2) });
+        }
+        else if (itemRoll <= 6) {
+            results.push({ stat: 'perception', requirement: difficultyRoll, reward: new EmptyVial() });
+        }
+    }
+
+    return results;
 }
 
 export {
