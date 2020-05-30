@@ -32,7 +32,7 @@ class Note extends Item {
             '',
             'To restore health, try bloodletting... Just use empty vials... It might drain your stamina a little but the resulting Blood vial is worth the risk...'
         ];
-        const label = 'Strange Note';
+        const label = 'Strange Note (#' + contents + ')';
         let description = 'It\'s an old scrap of paper with text scrawled across it, almost illegible.  The ink is smeared as though whoever left it was in a hurry. ';
         description += 'You can barely make out the contents, it reads "' + notes[contents] + '"';
         super(label, 1, description);
