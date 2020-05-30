@@ -140,7 +140,8 @@ class LockedDoorTile extends MapTile {
         };
         super(x, y, states, [], []);
         const solutions: Solution[] = [
-            { type: 'item', item: new PlainMensBoots(), stat: 0, flavorText: 'Oh wow. You stuck a pair of boots into a key hole. Are you retarded?'}
+            { type: 'item', item: new PlainMensBoots(), stat: 0, flavorText: 'Oh wow. You stuck a pair of boots into a key hole. Why did that work!?'},
+            { type: 'strength', item: undefined, stat: 5, flavorText: 'Oh WOW. You tried the handle to see if it was locked or just stuck, and you ripped the whole locking mechanism clean off!'}
         ];
 
         this.blockedPaths = [
