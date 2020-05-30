@@ -615,6 +615,7 @@ export class DungeonComponent implements OnInit {
     ];
 
     if (!command[1]) {
+      this.output('!!! This command is outdated since the Commands Panel was created. Let me know if you think I should keep this or scrap it.');
       this.output('Here is the list of commands you have access to:');
       commandList.forEach(commandString => {
         this.output(commandString);

@@ -20,6 +20,7 @@ export class CommandsHelperComponent {
   eastKeywords = ['right', 'east', 'e', 'r'];
   westKeywords = ['left', 'west', 'w', 'l'];
   takeKeywords = ['take', 't', 'loot', 'grab', 'pick-up'];
+  openKeywords = ['open', 'unlock', 'force'];
 
   commands = [
     {
@@ -43,6 +44,11 @@ export class CommandsHelperComponent {
       helpText: 'Use this keyword to attack the current enemy.  Your attack damage is determined by your strength stat and currently equipped items.'
     },
     {
+      label: 'flee',
+      aliases: this.fleeKeywords,
+      helpText: 'Use this keyword with a [Direction] to attempt to flee from combat.  Your chance of fleeing is effected by your luck and the current enemy\'s stats.'
+    },
+    {
       label: 'equip',
       aliases: this.equipKeywords,
       helpText: 'Use this keyword paired with an [Item Number] to equip that item from your inventory. You can only have one item in any given [Equipment Slot]. Any item already in that slot will automatically be unequipped.'
@@ -63,9 +69,9 @@ export class CommandsHelperComponent {
       helpText: 'Use this keyword to Inspect things your character can see such as an [Item Number], \'equipment [Equipment Number\',  \'room\', or (when in combat) \'enemy\'.'
     },
     {
-      label: 'flee',
-      aliases: this.fleeKeywords,
-      helpText: 'Use this keyword with a [Direction] to attempt to flee from combat.  Your chance of fleeing is effected by your luck and the current enemy\'s stats.'
+      label: 'open',
+      aliases: this.openKeywords,
+      helpText: 'Use this keyword to open closed doors in your current room.  You might not always succeed, but certain items and skills can help.'
     },
     {
       label: 'north',
