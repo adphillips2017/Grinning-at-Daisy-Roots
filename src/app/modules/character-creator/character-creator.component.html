@@ -23,7 +23,7 @@
                     <div class="label">{{stat.label}}</div>
                     <div class="answer">
                         <button [disabled]="!canDecrease(stat)" class="stat-button" (click)="decreaseStat(stat)">-</button>
-                        <div class="stat-value">{{ player[stat.stat] }}</div>
+                        <div class="stat-value">{{ placeHolderPlayer[stat.stat] }}</div>
                         <button [disabled]="!canIncrease()" class="stat-button" (click)="increaseStat(stat)">+</button>
                     </div>
                 </div>

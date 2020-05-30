@@ -65,7 +65,7 @@ export class CharacterCreatorComponent implements OnInit {
   ];
 
   ngOnInit() {
-    this.placeHolderPlayer = this.player;
+    this.placeHolderPlayer = Object.assign({}, this.player);
   }
 
   increaseStat(stat: Stat): void {
