@@ -1,13 +1,16 @@
 .hero-panel {
     width: 16rem;
+    border: 10px solid  black;
 
     .hero-portrait {
-        height: 12rem;
+        width: 100%;
+        margin-bottom: -.5rem;
     }
 
     .hero-stats {
         border: 1px solid black;
         border-bottom: none;
+        background-color: white;
 
         .hero-stat {
             display: flex;

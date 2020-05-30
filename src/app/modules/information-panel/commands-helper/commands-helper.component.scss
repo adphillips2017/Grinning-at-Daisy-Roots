@@ -1,0 +1,29 @@
+.commands-helper {
+    .command {
+        margin-bottom: 2rem;
+
+        .command-label {
+            border: 1px solid black;
+            padding: .25rem;
+            text-align: center;
+            background-color: #6c221b;
+            color: white;
+        }
+
+        .help-text {
+            padding: 1rem;
+        }
+
+        .alias-label {
+            border-bottom: 1px solid black;
+            border-top: 1px solid black;
+            text-align: center;
+        }
+
+        .aliases-list {
+            padding: 1rem;
+            padding-top: 0rem;
+            padding-bottom: 0rem;
+        }
+    }
+}

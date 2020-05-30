@@ -1,0 +1,19 @@
+<div class="mini-map" title="Click for full map">
+    <div class="map-row">
+        <div class="map-tile" [class.room]="tileIsRoom(miniMap[0][0])"></div>
+        <div class="map-tile" [class.room]="tileIsRoom(miniMap[0][1])"><div class="north">N</div></div>
+        <div class="map-tile" [class.room]="tileIsRoom(miniMap[0][2])"></div>
+    </div>
+
+    <div class="map-row">
+        <div class="map-tile" [class.room]="tileIsRoom(miniMap[1][0])"><div class="west">W</div></div>
+        <div class="map-tile player-tile" [class.room]="tileIsRoom(miniMap[1][1])"><div class="player">You</div></div>
+        <div class="map-tile" [class.room]="tileIsRoom(miniMap[1][2])"><div class="east">E</div></div>
+    </div>
+
+    <div class="map-row">
+        <div class="map-tile" [class.room]="tileIsRoom(miniMap[2][0])"></div>
+        <div class="map-tile" [class.room]="tileIsRoom(miniMap[2][1])"><div class="south">S</div></div>
+        <div class="map-tile" [class.room]="tileIsRoom(miniMap[2][2])"></div>
+    </div>
+</div>

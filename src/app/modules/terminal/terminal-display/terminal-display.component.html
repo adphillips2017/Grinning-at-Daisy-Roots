@@ -1,6 +1,6 @@
-<div class="terminal-display">
+<div class="terminal-display" #terminal>
     <div class="display" *ngFor="let message of messages">
-        <div *ngIf="message.type == 'user-input'; else systemOutput" class="input">
+        <div *ngIf="message.type == 'player-input'; else systemOutput" class="input">
             <div class="input-bullet">></div>
             <div class="input-message">{{ message.message }}</div>
         </div>

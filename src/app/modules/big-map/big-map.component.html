@@ -1,0 +1,44 @@
+<div class="container">
+    <div class="legend">
+        <div class="items">
+            <div class="item">
+                <div class="color currentTile"></div>
+                <div class="label">Current Tile</div>
+            </div>
+
+            <div class="item">
+                <div class="color traveled"></div>
+                <div class="label">Traveled Tile</div>
+            </div>
+
+            <div class="item">
+                <div class="color found"></div>
+                <div class="label">Found Tile</div>
+            </div>
+
+            <div class="item">
+                <div class="color unknown"></div>
+                <div class="label">Unknown</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="big-map">
+        <div class="map-row" *ngFor="let row of map">
+            <div *ngFor="let tile of row">
+                <div
+                    *ngIf="!!tile; else unknownTile"
+                    class="map-tile"
+                    [class.currentTile]="tile.x === playerX && tile.y === playerY"
+                    [class.traveled]="tile.traveled === true"
+                    [class.found]="tile.found === true && tile.traveled === false"
+                ></div>
+                <ng-template #unknownTile>
+                    <div class="map-tile"></div>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+
+    <div class="close-div" (click)="closeMap.emit()">Close (Esc)</div>
+</div>

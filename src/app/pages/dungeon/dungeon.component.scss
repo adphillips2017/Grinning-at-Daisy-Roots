@@ -6,28 +6,31 @@
         justify-content: space-between;
 
         .middle-column {
-            width: 100%;
+            width: 60%;
             padding: 2rem;
             padding-top: 0px;
+            text-align: center;
+
+            .main-image {
+                width: 100%;
+                border: 10px solid black;
+            }
 
             .terminal {
-                margin-top: 2rem;
+                margin-top: -1rem;
                 font: 1rem Inconsolata, monospace;
+                text-align: left;
+                background-color: white;
+                width: 100%;
+                border: 10px solid black;
             }
-        }
-
-        .temp-main-display {
-            height: 31rem;
-            width: 100%;
-        }
-
-        .temp-map {
-            height: 24rem;
-            width: 24rem;
         }
     }
 }
 
-.placeholder {
-    background-color: lightgray;
+.full-screen {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 3rem;
 }
+

@@ -1,0 +1,40 @@
+.mini-map {
+    border: 10px solid black;
+    cursor: pointer;
+
+    .map-row {
+        display: flex;
+        flex-direction: row;
+
+        .map-tile {
+            height: 5rem;
+            width: 5rem;
+            background-color: black;
+            border: 1px solid black;
+
+            .player {
+                margin-top: 2rem;
+                text-align: center;
+            }
+            .north { text-align: center; }
+            .west { margin-top: 2rem; }
+            .east {
+                margin-top: 2rem;
+                text-align: right;
+            }
+            .south {
+                text-align: center;
+                margin-top: 4rem;
+            }
+        }
+        .room {
+            background-image: url('../../../assets/images/mini-map/floor.png');
+            background-size: cover;
+            border: 1px solid black;
+            color: white;
+        }
+        .player-tile {
+            border: 1px dashed white;
+        }
+    }
+}
