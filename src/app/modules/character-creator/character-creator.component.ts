@@ -17,7 +17,7 @@ export class CharacterCreatorComponent implements OnInit {
   @Input() player: Player;
   @Output() playerFinalized = new EventEmitter<Player>();
 
-  placeHolderPlayer: Player;
+  placeHolderPlayer: Player = new Player();
   playerName = '';
   playerStats: Stat[] = [
     {
@@ -65,7 +65,7 @@ export class CharacterCreatorComponent implements OnInit {
   ];
 
   ngOnInit() {
-    this.placeHolderPlayer = Object.assign({}, this.player);
+    this.placeHolderPlayer = Object.assign(this.placeHolderPlayer, this.player);
   }
 
   increaseStat(stat: Stat): void {

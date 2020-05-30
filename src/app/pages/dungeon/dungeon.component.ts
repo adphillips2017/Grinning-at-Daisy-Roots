@@ -292,8 +292,8 @@ export class DungeonComponent implements OnInit {
       }
     }
 
-    if (command[1] === 'chest') {
-      if (this.currentTile() instanceof LootTile && this.currentTile().availableLoot.length > 0) {
+    if (this.currentTile() instanceof LootTile) {
+      if (this.currentTile().availableLoot.length > 0) {
         this.output('You walk slowly up to the wooden chest, unsure of what it might contain.');
         this.output('You stop before it.  Staring down at it you hesitate.  You have doubts as to the pleasantness of its contents.');
         this.output('You\'re curiousity gets the better of you and you slowly lift the lid of the chest to reveal its contents.');
@@ -302,13 +302,11 @@ export class DungeonComponent implements OnInit {
           this.output(this.player.giveItem(item));
         });
         this.currentTile().availableLoot = [];
-      } else if (this.currentTile() instanceof LootTile && this.currentTile().availableLoot.length <= 0) {
+      } else if (this.currentTile().availableLoot.length <= 0) {
         this.output('You stare at the empty chest and contemplate how you could possibly loot it?');
         this.output('Maybe you could take the chest itself!');
         this.output('...');
         this.output('... no, you had better not.');
-      } else {
-        this.output('There is no such thing to loot in the room.. You must be going mad.');
       }
       return;
     }
