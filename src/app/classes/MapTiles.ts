@@ -140,9 +140,14 @@ class LockedDoorTile extends MapTile {
             }
         };
         super(x, y, states, [], []);
+        let flavorTextItem = 'You realize that you\'ve seen the craftsmanship on the lock somewhere before';
+        flavorTextItem += ' as you reach for the key in your pocket.  To your satisfaction you hear a promising';
+        flavorTextItem += ' *clink* noise as you insert and turn the key.  The door loosens on its hinges.  You can now continue that direction.';
+        let flavorTextStrength = 'Oh WOW. You tried the handle to see if it was locked or just stuck,';
+        flavorTextStrength += ' and you ripped the whole locking mechanism clean off!  I guess you can continue this direction now.';
         const solutions: Solution[] = [
-            { type: 'item', item: new OrnateKey(), stat: 0, flavorText: 'Oh wow. You stuck a pair of boots into a key hole. Why did that work!?'},
-            { type: 'strength', item: undefined, stat: 5, flavorText: 'Oh WOW. You tried the handle to see if it was locked or just stuck, and you ripped the whole locking mechanism clean off!'}
+            { type: 'item', item: new OrnateKey(), stat: 0, flavorText: flavorTextItem },
+            { type: 'strength', item: undefined, stat: 10, flavorText: flavorTextStrength }
         ];
 
         this.blockedPaths = [

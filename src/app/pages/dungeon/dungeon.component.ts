@@ -10,7 +10,7 @@ import { TerminalMessage } from 'src/app/models/TerminalMessage';
 import { Loot } from 'src/app/models/Loot';
 import { Item, OrnateKey, Note } from 'src/app/classes/Items';
 import { MiniMapComponent } from 'src/app/modules/mini-map/mini-map.component';
-import { Consumable, EmptyVial, BloodVial } from 'src/app/classes/Consumables';
+import { Consumable, EmptyVial, BloodVial, StaleBread } from 'src/app/classes/Consumables';
 import { Equipment, WoodCane } from 'src/app/classes/Equipment';
 
 @Component({
@@ -204,7 +204,7 @@ export class DungeonComponent implements OnInit {
     }
 
     if (this.contains(keyword, this.helpKeywords)) {
-      this.help(command);
+      this.help();
     }
     else if (this.contains(keyword, this.moveKeywords)) {
       this.move(command);
@@ -244,7 +244,7 @@ export class DungeonComponent implements OnInit {
     }
     else {
       this.output('Command not recognized, please try again.');
-      this.output('Type "help" for a list of commands.');
+      this.output('Check the commands list to the right for more information.');
     }
   }
 
@@ -255,14 +255,18 @@ export class DungeonComponent implements OnInit {
     }
 
     this.currentTile().searched = true;
+    let foundItem = false;
     this.output('You begin scouring the room for anything that might be useful.');
 
     this.currentTile().searchResults.forEach(result => {
       if (this.player.perception >= result.requirement) {
         this.output('You happen to find a ' + result.reward.label + ' hidden in the room.');
         this.output(this.player.giveItem(result.reward));
+        foundItem = true;
       }
     });
+
+    if (!foundItem){ this.output('You don\'t find anything of use.'); }
   }
 
   open(){
@@ -287,7 +291,7 @@ export class DungeonComponent implements OnInit {
             this.unlockTile(path);
           }
         } else {
-          if (this.player[solution.type] >= solution.stat) {
+          if (this.player[solution.type] >= solution.stat && !success) {
             message = solution.flavorText;
             success = true;
             this.unlockTile(path);
@@ -489,14 +493,14 @@ export class DungeonComponent implements OnInit {
       }
       return;
     }
-
-    if (!command[1]) {
-      if (this.currentTile().availableLoot.length > 1) {
-        this.output('You didn\'t pass in an item number to take, but you do see ' + this.getAvailableLootString());
-      } else {
-        this.output('There\'s nothing lying around worth taking.');
-        return;
-      }
+    else if (!command[1]) {
+      this.output('You grab everything that looks like it might be useful.');
+      this.currentTile().availableLoot.forEach(item => {
+        this.output(this.player.giveItem(item));
+      });
+      if (this.currentTile().availableLoot.length < 1) { this.output('Which is apprently nothing.'); }
+      this.currentTile().availableLoot = [];
+      return;
     }
 
     const takeChoice = parseInt(command[1], 10);
@@ -608,41 +612,43 @@ export class DungeonComponent implements OnInit {
   }
 
   handleCombat(actions: string[], playerCommand: string[]){
-    if (this.contains(playerCommand[0], this.attackKeywords) && this.contains('attack', actions)){
+    if (this.contains(playerCommand[0], this.attackKeywords)){
       if (!this.player.hasEnoughStamina(this.staminaCost.combat)) {
         this.output('You are exhausted and must take a moment to gather your strength.');
         this.output('Stamina +2');
         this.player.stamina += 2;
-        return;
+        this.player.incrementActionCount();
       }
-      const playerDamage = this.player.getDamage();
-      this.currentEnemy().takeDamage(playerDamage);
-      this.player.incrementActionCount();
-      this.player.modifyStamina(this.staminaCost.combat);
-      this.output('You hit the ' + this.currentEnemy().name + ' for ' + playerDamage + ' damage.');
+      else {
+        const playerDamage = this.player.getDamage();
+        this.currentEnemy().takeDamage(playerDamage);
+        this.player.incrementActionCount();
+        this.player.modifyStamina(this.staminaCost.combat);
+        this.output('You hit the ' + this.currentEnemy().name + ' for ' + playerDamage + ' damage.');
 
-      if (!this.currentEnemy().isAlive) {
-        this.output('You slayed the ' + this.currentEnemy().name + '.');
-        const lootRoll = this.rollForLoot(this.currentEnemy().loot);
-        this.currentTile().currentState = 2;
+        if (!this.currentEnemy().isAlive) {
+          this.output('You slayed the ' + this.currentEnemy().name + '.');
+          const lootRoll = this.rollForLoot(this.currentEnemy().loot);
+          this.currentTile().currentState = 2;
 
-        if (lootRoll) {
-          const lootItem = this.getLoot(this.currentEnemy().loot, lootRoll);
-          this.currentTile().availableLoot.push(lootItem);
-          this.output('The ' + this.currentEnemy().name + ' dropped ' + lootItem.label + ' onto the ground.');
+          if (lootRoll) {
+            const lootItem = this.getLoot(this.currentEnemy().loot, lootRoll);
+            this.currentTile().availableLoot.push(lootItem);
+            this.output('The ' + this.currentEnemy().name + ' dropped ' + lootItem.label + ' onto the ground.');
+          }
+        } else {
+          this.output('The ' + this.currentEnemy().name + ' has ' + this.currentEnemy().getHealth() + ' health left.');
         }
-      } else {
-        this.output('The ' + this.currentEnemy().name + ' has ' + this.currentEnemy().getHealth() + ' health left.');
       }
     }
-    else if (this.contains(playerCommand[0], this.fleeKeywords) && this.contains('flee', actions)) {
+    else if (this.contains(playerCommand[0], this.fleeKeywords)) {
       if (!this.player.hasEnoughStamina(this.staminaCost.flee)) {
         this.output('You are exhausted and must take a moment to gather your strength.');
         this.output('Stamina +2');
         this.player.stamina += 2;
-        return;
+        this.player.incrementActionCount();
       }
-      if (this.attemptToFlee(playerCommand)) {
+      else if (this.attemptToFlee(playerCommand)) {
         this.player.modifyStamina(this.staminaCost.flee);
         this.flee(playerCommand);
         return;
@@ -736,37 +742,17 @@ export class DungeonComponent implements OnInit {
     return item;
   }
 
-  help(command: string[]) {
-    const commandList = [
-      'help         - print a list of commands.  User help "command" to get information about a specific command',
-      'move         - aliases: go, walk, travel, move, w, step, run, m',
-      'inventory    - aliases: i'
+  help() {
+    const helpMessages = [
+      'First and foremost, this game is still in development, so you might experience some wonkey interactions, bugs or just unbalanced combat.',
+      'Please let me know of any issues you come across to be sure I\'m aware of them.',
+      'If you\'re doing very little damage, try allocating more points to strength, equipping a weapon, or checking your stamina.  Lower stamina reduces you\'re damage output.',
+      'If you\'re running out of stamina, food replenishes it.  Food is dropped by enemies sometimes, or you can "search" rooms to try and find more. Searching rooms success is based on your Perception skill.',
+      'To get past doors, you need either a key or sometimes a specific stat requirement can bypass the key need.  Use the "open" command to try to open it.',
+      'Pretty much everything should be able to be inspected, so try that if you want more information about something in the game world.'
     ];
 
-    if (!command[1]) {
-      this.output('!!! This command is outdated since the Commands Panel was created. Let me know if you think I should keep this or scrap it.');
-      this.output('Here is the list of commands you have access to:');
-      commandList.forEach(commandString => {
-        this.output(commandString);
-      });
-      return;
-    }
-
-    const helpItem = command[1];
-
-    if (this.contains(helpItem, this.moveKeywords)) {
-      this.output('"move":  move your character in one of four directions.');
-      this.output('Example:  move (north / up / forward...)');
-      this.output('move aliases: ' + this.arrayToString(this.moveKeywords));
-    }
-    else if (this.contains(helpItem, this.inventoryKeywords)){
-      this.output('"inventory": list the items currently in your inventory');
-      this.output('inventory aliases: ' + this.arrayToString(this.inventoryKeywords));
-    }
-    else {
-      this.output('Command not recognized, please try again.');
-      this.output('Type "help" for a list of commands.');
-    }
+    helpMessages.forEach(message => this.output(message));
   }
 
   move(command: string[], movementMessage: string = 'You walk '){
@@ -808,7 +794,6 @@ export class DungeonComponent implements OnInit {
     this.miniMap.generateMiniMap();
     this.playIntro();
     this.updateMapTileStatuses();
-    console.log('map: ', this.worldMap);
     if (this.currentTile() instanceof ExitTile) { this.gameOver(); }
   }
 

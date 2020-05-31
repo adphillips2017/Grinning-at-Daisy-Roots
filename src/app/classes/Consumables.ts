@@ -16,7 +16,7 @@ class StaleBread extends Consumable {
     constructor(count: number = 1){
         const label = 'Stale Bread';
         const description = 'Bread so old and hard it might be used as a weapon, nevertheless it appears invigorating.';
-        const effects = [{ stat: 'stamina', modifier: 5}];
+        const effects = [{ stat: 'stamina', modifier: 6}];
         let useText = 'You attempt to bite into the bread with your front teeth but feel as though they might break. ';
         useText += 'You resort to skipping the incisors entirely and go straight to the molars. It crunches like rock candy but you get it down. ';
         useText += 'You feel slightly invigorated despite the horrid condition of the bread.';
@@ -29,7 +29,7 @@ class EmptyVial extends Consumable {
     constructor(count: number = 1){
         const label = 'Empty Blood Vial';
         const description = 'An empty vial often used by physicians for bloodletting. It is accompanied most conveniently with a needle and surgical tube.';
-        const effects = [{ stat: 'health', modifier: 5 }, {stat: 'stamina', modifier: -5 }];
+        const effects = [{ stat: 'health', modifier: 5 }, {stat: 'stamina', modifier: -2 }];
         let useText = 'You attach the needle to the surgical tube, and it to the vial.  You stick the needle into your arm.';
         useText += ' As the vial begins to turn crimson you feel a sense of relief fall over you, even if it did hurt initially.';
         useText += ' You slip the fresh vial of blood back into your inventory.';
@@ -51,7 +51,7 @@ class BloodVial extends Consumable {
         const effects = [{ stat: 'health', modifier: healthModifier }, { stat: 'strength', modifier: strengthModifier, duration }];
         let useText = 'You reattach the surgical tube and needle to the bottle before inserting the needle into your arm.';
         useText += ' As you raise the bottle above your head you feel the warmth of the blood entering your arm. The rush is intoxicating.';
-        if (age === 1) { useText = 'You inject the blood just as you\'ve done a hundred times before, but the reassuring rush of warmth never comes.  It\'s maddening.  Perhaps in your haste you have robbed it of its potency?'; }
+        if (age === 0) { useText = 'You inject the blood just as you\'ve done a hundred times before, but the reassuring rush of warmth never comes.  It\'s maddening.  Perhaps in your haste you have robbed it of its potency?'; }
 
         super(label, description, effects, useText);
         this.age = age;

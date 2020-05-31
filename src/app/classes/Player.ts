@@ -271,9 +271,8 @@ export class Player {
 
     modifyStamina(modifier: number): void {
         this.stamina = this.stamina + modifier;
-        if (this.stamina > this.maxStamina) {
-            this.stamina = this.maxStamina;
-        }
+        if (this.stamina > this.maxStamina) { this.stamina = this.maxStamina; }
+        if (this.stamina < 0) { this.stamina = 0; }
     }
 
     hasEnoughStamina(staminaRequired: number): boolean {
@@ -362,6 +361,10 @@ export class Player {
 
     removeItem(item: Item): void {
         if (this.inventory.indexOf(item) < 0){ return; }
+        if (this.inventory[this.inventory.indexOf(item)].count > 1) {
+            this.inventory[this.inventory.indexOf(item)].count--;
+            return;
+        }
         this.inventory.splice(this.inventory.indexOf(item), 1);
     }
 

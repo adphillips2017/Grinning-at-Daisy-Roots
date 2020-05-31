@@ -27,6 +27,11 @@ export class CommandsHelperComponent {
 
   commands = [
     {
+      label: 'help',
+      aliases: this.helpKeywords,
+      helpText: 'Use this keyword if you\'re stuck and need some ideas.'
+    },
+    {
       label: 'move',
       aliases: this.moveKeywords,
       helpText: 'Use this keyword to move your character around the game world.  Must be paired with a [Direction].'
